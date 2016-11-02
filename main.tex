@@ -1,0 +1,59 @@
+\documentclass[a4paper,12pt,english, T1]{book}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{tikz-dependency}
+\usepackage{times}
+\usepackage{multirow}
+\usepackage{tablefootnote}
+\usepackage{booktabs}
+\usepackage{covington}
+\usepackage{relsize}
+\usepackage{hyperref}
+\usepackage{appendix}
+\usepackage{duomasterforside}
+\usepackage{emptypage}
+\usepackage{tocbibind}
+\usepackage{url}
+\usepackage{tikz}
+\usepackage{apacite}
+\usepackage{amsmath}
+
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\sectionmark}[1]{\markright{\thesection.\ #1}}
+\renewcommand{\chaptermark}[1]{\markboth{\textsc{\thechapter.\ #1}}{}}
+\lhead[\leftmark]{}
+\rhead[]{\rightmark}
+\lfoot[\thepage]{}
+\rfoot[]{\thepage}
+
+\title{Improving Frame Accuracy for Semantic Dependency Parsing}
+\author{Arash Saidi}
+
+\begin{document}
+\duoforside{}
+
+\include{0_abstract}
+\include{0_acknowledgements}
+
+\frontmatter{}
+\fancyhead[LE]{\nouppercase\leftmark}
+\fancyhead[RO]{\nouppercase\rightmark}
+\tableofcontents{}
+\listoftables{}
+\listoffigures{}
+
+\mainmatter{}
+\include{1_introduction}
+\include{2_background}
+\include{3_semantic_parsing_frames}
+\include{4_error_analysis}
+\include{5_experiments}
+\include{6_conclusion}
+
+\backmatter
+\bibliographystyle{apacite}
+\bibliography{bib}
+
+\end{document}
