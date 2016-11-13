@@ -1,0 +1,361 @@
+\documentclass[10pt]{article}
+
+% bibliography
+% Check the different ways of citing
+\usepackage[backend=biber,style=authoryear]{biblatex}
+\addbibresource{bibfile.bib}
+
+% For dependency trees
+\usepackage{tikz-dependency}
+
+% For writing utf8 characters.
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern} % load a font with all the characters
+
+% for constituent graphs
+\usepackage{tikz}
+\usepackage{tikz-qtree}
+
+% for context free grammars as lists
+\usepackage{listings}
+
+% For figures
+\usepackage{graphicx}
+
+% for Qutations
+\usepackage{dirtytalk}
+\usepackage{csquotes}
+
+% Example of usage:
+% \begin{dependency}[theme = simple]
+%    \begin{deptext}[column sep=1em]
+%       A \& hearing \& is \& scheduled \& on \& the \& issue \& today \& . \\
+%    \end{deptext}
+%    \deproot{3}{ROOT}
+%    \depedge{2}{1}{ATT}
+%    \depedge[edge start x offset=-6pt]{2}{5}{ATT}
+%    \depedge{3}{2}{SBJ}
+%    \depedge{3}{9}{PU}
+%    \depedge{3}{4}{VC}
+%    \depedge{4}{8}{TMP}
+%    \depedge{5}{7}{PC}
+%    \depedge[arc angle=50]{7}{6}{ATT}
+% \end{dependency}
+
+\title{Semantic Dependency Parsing}
+\author{Arash Saidi}
+
+% % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % 
+% BEGINNING OF DOCUMENT
+\begin{document}
+
+\maketitle{}
+
+% % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % 
+% Chapter
+\section{Introduction}
+Dependency grammar and dependency parsing have seen an increase of interest in recent years. This has been motivated by the potential usefulness of bi-lexical relations in such tasks as word-sense disambiguation, automatic translation, and textual inference (\cite{Nivre05dependencygrammar}). Another reason for the increased interest is the hypothesis that dependency grammar is better suited than phrase structure grammar for languages with free or flexible word order. The predominant data structure for representing dependency relations in the research community to date have been \textit{trees}. A \textit{tree} data-structure is useful when representing syntactic information, but when dealing with semantic meaning representation, \textit{trees} have certain shortcomings. Examples of these shortcomings are cases when a node has multiple predicates (i.e. more than one incoming arc), when it is desirable to leave some nodes unattached (with no incoming arcs), or for semantically vacuous classes such as, for example, particles, complementers, or relative pronouns. 
+
+A \textit{graph} data-structure on the other hand can be used to represent the aforementioned cases. This thesis seeks to explore how \textit{graphs} can be used as data-structure for semantic dependency parsing, and ways in which current attempts can be improved upon. The hypothesis is that using \textit{graphs} can better represent semantic information (i.e meaning).
+
+The notion of a dependency is based on the idea that the syntactic structure of a sentence consists of (binary) asymmetrical structural relations between words. These dependency relations hold between what is often referred to as head(s) and dependent(s) in the literature, and these are the terms used henceforth in this essay. The criteria for automatically establishing head(s) and dependent(s) and their type of relations is central to dependency parsing. In this essay we present the historical, theoretical and practical aspects of dependency grammar and dependency parsing as they relate to our thesis. The structure of the essay is as follows:
+
+\begin{enumerate}
+\item Short introduction to \textit{dependency grammar}.
+\item Presentation of \textit{dependency parsing} and recent literature on the topic.
+\item Presentation of our hypothesis and planned research as it relates to our thesis.
+\item Concluding remarks.
+\end{enumerate}
+% % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % %
+
+% % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % %
+% Chapter
+\section{Dependency Grammar}
+
+% NOTE
+% Sidetall på sitater
+% referring to tesniere, refer to the original
+The early roots of dependency grammar can possibly be traced back to Panini's grammar of Sanskrit. However, the modern study of dependency grammar is first presented in the works of Lucien Tesni\`ere (\cite{tesniere2015elements}). In his work \textit{Elements of Structural Syntax}, Tesni\`ere presents a theory of syntax by focusing on what he calls a \textit{connection}: 
+
+\begin{displayquote}
+The sentence is an \textit{organized whole}; its constituent parts are the \textit{words}. Every word that functions as part of a sentence is no longer isolated as in the dictionary: the mind perceives \textit{connections} between the word and its neighbors; the totality of these connections forms the scaffolding of the sentence (\cite{tesniere2015elements}).
+\end{displayquote}
+
+Tesni\`ere claims that these \textit{connections} are what makes a sentence meaningful: \say{[W]ithout them the sentence would not be intelligible}. (\cite{tesniere2015elements}). From the works of Tesni\`ere', the field of dependency grammar has grown into a wide range of traditions that explore the notion of \textit{connections}, or in modern terms \textit{dependency relations}, using different theoretical approaches. Among them are the Prague School's Functional Generative Description, Meaning-Text Theory, and Hudson's Word Grammar (\cite{sgall1986meaning}; \cite{melcuk}; \cite{hudson1990english}). 
+
+A common approach to these theories is to present \textit{dependency relations} (or \textit{dependencies} for short) among the words of a sentence as a graph. Formally, we can describe the dependencies in a sentence $\vec{w} = w_1 ... w_n$ as a directed graph on the set of positions $\vec{w}$ that contain an edge $i \rightarrow j$ if and only if $w_j$ depends on $w_i$ (\cite{kuhlmann2010dependency}). Using a directed graph means that we have directional arrows from one word to another. These arrows represent a source and a target, which we have already established as head and dependent respectively. Each arrow can have a label that describes the \textit{dependency type} between two words. If we examine Figure 1, the noun \textit{news} is dependent on the verb \textit{had} with a dependency type (the label) \textit{subject} (SBJ). 
+
+One thing to note about the dependency structure in Figure 1 is the dependency between the \textit{punctuation} and the verb \textit{had}. This is a technicality that has been added to simplify both formal definitions and computational implementations. The same applies to the artificially added element ROOT. The ROOT node is particularly useful in cases where we are dealing with words that have no \textit{natural} head. In figure 1 we can see such a case with the verb \textit{had}. We can say that this verb is dependent on the ROOT node so that we avoid leaving it dangling with no head.
+
+% Dependency graph
+\begin{figure}
+\begin{dependency}[theme = simple]
+\begin{deptext}[column sep=1em]
+ROOT \& Economic \& news \& had \& little \& effect \& on \& financial \& markets \& . \\
+\end{deptext}
+\depedge{1}{4}{}
+\depedge{3}{2}{NMOD}
+\depedge{4}{3}{SBJ}
+\depedge{4}{10}{PU}
+\depedge{4}{6}{OBJ}
+\depedge{6}{5}{NMOD}
+\depedge{6}{7}{NMOD}
+\depedge{7}{9}{PMOD}
+\depedge{9}{8}{NMOD}
+\end{dependency}
+\caption{Example of a dependency structure for an English sentence}
+\end{figure}
+
+From here we can go further by looking at a set of criteria that can be used for establishing dependency relations between words. The list below are some common criteria for distinguishing the head (H) and the dependent (D) in a given construction (C) (\cite{Nivre05dependencygrammar}; \cite{ZwickyHead}):
+
+\begin{enumerate}
+\item (H) determines the syntactic category of (C) and can often replace (C).
+\item (H) determines the semantic category of (C), whereas (D) specifies the semantic category of (C).
+\item There must be a (H), whereas (D) is optional.
+\item (H) selects the category of (D) and whether it is obligatory or optional.
+\item The form of (D), whether it is agreement or government, depends on (H).
+\item The linear position of (D) is specified with reference to (H).
+\end{enumerate}
+
+Different traditions of dependency grammar diverge in the interpretation and use of a set of criteria for identifying dependencies. The list above encompass a set of syntactic and semantic criteria for establishing dependencies, but do not fully cover the range of possible dependencies. Mel'čuk claims that the word forms of a sentence can be linked by three types of dependencies: \textit{morphological}, \textit{syntactic}, and \textit{semantic} (\cite{melcuk}). Nikula adds further criteria for distinguishing between \textit{endocentric} and \textit{exocentric} constructions (\cite{nikula1986dependensgrammatik}). An \textit{endocentric} construction is a grammatical contstruct (e.g. a phrase or compound word) that has the same linguistic function as one of its parts. The opposite of this is known as an \textit{exocentric} construct. This distiction is only possible in phrase structure grammars, as the constructions in a dependency grammar are all \textit{endocentric} (\cite{endocentric-exocentric}). This is because the concept of head and dependent(s) requires it be such that the head has the same linguistic function (e.g. semantic content, grammatical category) as its depentent(s).
+
+% check if this is right, drop it
+% The difference between \textit{endocentric} and \textit{exocentric} constructions can be explained in terms of which of the criteria above they adhere to. \textit{Endocentric} constructions may satisfy all the criteria, but usually have less consideration for number 4. We can observe such a construction in Figure 1, the NMOD relation between the noun \textit{markets} and the adjective \textit{financial}. Here the head can replace the whole without affecting the syntactic structure. \textit{Exocentric} constructions fail on criterion number 1, and this is something we can observe in the SBJ and OBJ relations in Figure 1. Clear cases of exocentric dependencies are \textit{verbs} as \textit{head} and \textit{subjects} or \textit{objects} as \textit{dependents}. For endocentric dependencies these are cases where the head may be a \textit{verb} with \textit{adverbial} as dependency or \textit{noun} as head with an \textit{attribute} as \textit{dependent}.
+
+The dependency grammar and its theoretical approaches, which we have shortly outlined above, represent a large body of literature on the topic. However, as Kuhlman notes, from a linguistic and formal point of view, dependency grammar is somewhat of an island in relation to the field of linguistics as a whole:
+
+\begin{displayquote}
+In particular, there are few results that bridge between dependency syntax and other traditions, such as phrase-structure or categorical syntax. This makes it hard to gauge the similarities and differences in how the different paradigms can be used to model specific phenomena, and hampers the exchange of linguistic resources and computational methods (\cite{kuhlmann2010dependency}).
+\end{displayquote}
+
+In addition to the relative isolation of dependency grammar within the field of linguistics, the theories briefly outlined are also only indirectly linked to the techniques used in dependency parsing. According to Nivre \say{... [t]his may be due to the relatively lower degree of formalization of dependency grammar theories in general} (\cite{Nivre05dependencygrammar}). It is also important to note from the outset that our thesis is not on dependency grammar. We make the assumption that such a theoretical foundation exists, and that the dependency parsing techniques are loosely coupled with such a formal grammar. The work presented in our thesis is based on practical considerations such as the effectiveness and accuracy of different parsing techniques, and not grammatical aspects that relate to the theories presented above.
+
+Now that we have given an outline of dependency grammar, we turn our attention to dependency parsing. In doing so we follow Carroll (\cite{carroll2000statistical}) in distinguishing between two main approaches to dependency parsing, a \textit{grammar-driven approach} and a \textit{data-driven approach}. Common to both approaches is the goal of producing a labeled dependency structure (similar to that in Figure 1). The outcome should be a structure where the words of a sentence are connected by dependency relations. In the following two sections we give a description of these two approaches.
+
+% % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % 
+% Section
+\section{Dependency Parsing}
+Dependency parsing is the task of algorithmically finding a dependency structure for a given sentence. The first approaches to dependency parsing were built on techniques that assigned dependencies based on linguistic theories and formal grammars. Recent attempts have focused more on data-driven and/or statistical approaches where the construction of a dependency structure is based on \textit{machine learning} techniques that are trained on linguistic data as basis for parsing. Two classes of \textit{data-based} dependency parsing that are common are \textit{transition-based} and \textit{graph-based} dependency parsers. These two classes contain most of the recent data-driven parsers (\cite{kubler-sandra-mcdonald-ryan-nivre-book}). In the next two sections we give a short presentation of \textit{grammar-driven} and \textit{data-driven} dependency parsing.
+
+Before we precede with this task, we give a formal definition of dependency graphs that will be used as basis for our discussion. Dependency graphs are syntactic structures over sentences. A \textit{sentence} is a sequence of tokens denoted by $S = w_0w_1 ... w_n$. The precise definition of $w_i$ is language dependent and since tokenization is non-trivial we assume that some form of tokenization is present before parsing. A parser has a finite set of $R = {r_1, ... ,r_m} $ \textit{dependency relation types} that can hold between any two tokens in a sentence. A dependency graph $G = (V, A)$ is a labeled graph which consists of nodes, $V$, and arcs, $A$, such that for sentence $S = w_0w_1, ..., w_n$ and label set $R$, the following holds:
+
+\begin{enumerate}
+\item $V \subseteq {w_0w_1 ... w_n}$
+\item $A \subseteq V \times R \times V$
+\item if $(w_i, r, w_j) \subseteq A$ then $(w_i, \bar{r}, w_j) \not \in A$ for all $\bar{r} \neq r$
+\end{enumerate}
+
+The set of arcs $A$ represents the labeled dependency relations for an analysis $G$. More specifically we say that an arc $(w_i, r, w_j) \subseteq A$ represents a dependency from head $w_i$ to dependent $w_j$ with the label $r$. The end result being a dependency structure $G$ with labeled dependencies between the tokens in sentence $S$. Rule 3 is a restriction where the parser does not end up with \textit{multi-digraphs}: a directed graph where multiple arcs connecting to the same source and target nodes are allowed. This limitation ensures that we always end up with a single graph over the tokens in the input sentence.
+
+% % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % 
+% Chapter
+\subsection{Grammar-Driven Dependency Parsing}
+
+The \textit{grammar-driven approach} to dependency parsing relies on an explicitly defined grammar to produce a dependency graph. The parsing of a sentence is defined as an analysis in relation to a grammar, and if successful the sentence is then said to belong to the language defined by said grammar. The earliest works on dependency parsing were closely related to context-free grammars (\cite{kubler-sandra-mcdonald-ryan-nivre-book}). These methods use production rules in a context-free grammar to produce dependencies. Standard chart parsing methods can be used for implementation. These include the CKY (\cite{younger1967recognition}) or Earley’s algorithm (\cite{earley1970efficient}).
+
+The rules of a context-free grammar can be either implemented manually or learned through \textit{machine-learning}. The rules themselves can take the form of production or constraint rules, see Kübler et. al. for details (\cite{kubler-sandra-mcdonald-ryan-nivre-book}). According to Gaifman (\cite{GAIFMAN1965304}) we can generalize the rules that form a \textit{dependency grammar} with a set of three rules:
+
+\begin{enumerate}
+\item \textit{$L_1$}: Rules of the form $X(Y_1, ..., Y_i * Y_{i + 1} ... Y_n)$ where $i \leq 0 \leq n$, where the category $X$ may occur with categories $Y_1, ... ,Y_n$ as dependents with the order given, and with $X$ in the position of $*$.
+\item \textit{$L_2$}: For every category $X$ a set of words belonging to it. Words can belong to multiple categories.
+\item \textit{$L_3$}: A rule giving the list of all categories that can govern a sentence.
+\end{enumerate}
+
+A sentence consisting of words $w1, . . ., w_n$ is analyzed by assigning to it a sequence of categories $X_1, . . ., X_n$ and a relation of dependency $d$ between words such that the following conditions hold (where $r^{*}$ is the transitive closure of $r$):
+
+\begin{enumerate}
+\item For no $w_i , r{^*} (w_i,w_i)$.
+\item For every $w_i$, there is at most one $w_j$ such that $r(w_i,w_j)$.
+\item If $r{^*} (w_i,w_j)$ and $w_k$ is between $w_i$ and $w_j$, then $r{^*}(w_k,w_j)$.
+\item The whole set of word occurrences is connected by $r$.
+\item If $w_1, . . ., w_i$ are left dependent and $w_{i + 1}, . . ., w_n$ are right dependents of some word, and $X_1 ... X_i * X_{i + 1} ... X_n$ are categories of $w_1, . . ., w_i, w_{i + 1}, . . ., w_n$, then $X(X_1 ... X_i * X_{i + 1} ... X_n)$ is a rule of \textit{$L_1$}.
+\item The word occurrence $w_i$ that governs the sentence is listed in \textit{$L_3$}: the set of possible categories.
+\end{enumerate}
+
+Nivre points out that the rules and conditions outlined above create dependency graphs with a \textit{single-head} constraint (condition 2) and the \textit{projectivity} constraint (condition 3). The single head constraint means that a node can only have one head. Further, the restrictions above also ensure that the graph is a rooted tree (condition 1, 2 and 4 jointly, and also presupposed in condition 6). The parsing system only produces an unlabeled dependency analysis, since there are no dependency types used to label the dependency relations (\cite{Nivre05dependencygrammar}).
+
+Grammar-driven parsers have a set of grammatical rules that govern the assignment of dependencies. Because of the inherent ambiguity in natural language, we end up with a set of possible dependencies, and a disambiguation post-processing part where the most probable/accurate is selected. In part due to the problems with grammar-driven dependency parsers, and in part due to the fact that data-driven approaches have yielded better results, there has been a shift in the research community towards data-driven approaches.
+% % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % %
+
+% % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % 
+% Chapter
+\subsection{Data-Driven Dependency Parsing}
+Early attempts at data-driven dependency parsing where probabilistic methods for disambiguation: taking the multiple outputs of the grammar-driven approach and deciding on the most suitable option (according to a set of training data derived from a corpus) (\cite{Nivre05dependencygrammar}). A more successful and influential approach was developed by Eisner (\cite{eisner1996_a_empirical}), who defined several probabilistic models for dependency parsing and evaluated them using supervised learning with data from the Wall Street Journal section of the Penn Treebank (\cite{penn-treebank}). Eisner (\cite{eisner2000bilexical}) showed that these models can be generalized under the notion of \textit{bi-lexical grammar} (BG) and \textit{weighted bi-lexical grammar} (WBG). Eisner presents three different probabilistic models for dependency parsing.
+
+The first two use a model with an underlying string (described by the WBG) and a surface string with the dependencies. The last model uses a probabilistic method where word tokens, part-of-speech tags, and (unlabeled) dependency relations are used to calculate the joint probability of word, tag and dependency (\cite{eisner2000bilexical}). According to Nivre, the work of Eisner has been influential in two ways; 1. that probabilistic models could yield accurate results comparable to the constituency parsers of its time, 2. that one could use these models in conjunction with efficient parsing techniques that exploit the special property of dependency structure (\cite{Nivre05dependencygrammar}).
+
+A data-driven dependency parser can formally be described as a model $M = (\Gamma, \Pi, h)$ where $\Gamma$ is a set of constraints that define the space of permissible structures for a given sentence, $\Pi$ is a set of parameters that are learned from data, and $h$ is a parsing algorithm. As mentioned previously, there are mainly two classes of data-driven dependency parsers: \textit{transition-based} and \textit{graph-based}. For porpuses of our thesis we will only examine \textit{transition-based} parsing techniques.
+
+
+\subsubsection{Transition-Based Parsing}
+A \textit{transition-based} parser consists of a set of \textit{configurations} (or \textit{states}) that include a set of \textit{transitions}. In this section we will focus on a simple \textit{stack-based} \textit{transition based} system that is widely used and is based on \textit{shift-reduce} parsing (\cite{kubler-sandra-mcdonald-ryan-nivre-book}). We can describe such a parser by way of a \textit{configuration} of triples consisting of a stack, an input buffer, and a set of dependency arcs. Given a set $R$ of dependency types, a \textit{configuration} for sentence $S = w_0w_1, ..., w_n$ is a triple $c = (\alpha, \beta, A)$, where:
+
+\begin{enumerate}
+\item $\alpha$ is a stack of words $w_i \in V$,
+\item $\beta$ is a buffer of words $w_i \in V$,
+\item A is a set of dependency arcs $(w_i, r, w_j) \in V_s \times R \times V$.
+\end{enumerate}
+
+The \textit{configuration} represents a partial analysis. The words on the stack $\alpha$ are partially processed words from the input, and the words in the buffer $\beta$ are the remaining words from the input. For any input sentence there is an \textit{initial} state, and a \textit{termination} state. The \textit{initial} state starts with the artificial word ROOT $(w_0)$ on the stack $\alpha$, the input sentence $S$ in the buffer, and an empty set of dependency arcs in the last place of the triple: $([w_0]_\alpha, [w_1, w_2, ..., w_n]_\beta, \emptyset)$, and ends in the \textit{termination} state: $(\alpha, []_\beta, A)$. There are three types of transitions from the \textit{initial} to \textit{termination} state:
+
+\begin{enumerate}
+\item $Left-Arc_r$ $(\alpha|w_i, w_j|\beta, A) \Rightarrow (\alpha, w_j|\beta, A \cup \{(w_j, r, w_i)\}$
+\item $Right-Arc_r$ $(\alpha|w_i, w_j|\beta, A) \Rightarrow (\alpha, w_i|\beta, A \cup \{(w_i, r, w_j)\}$
+\item $Shift$ $(\alpha, w_i|\beta, A) \Rightarrow (\alpha, w_i|\beta, A)$
+\end{enumerate}
+
+Each of these transitions can be described informally as:
+
+\begin{enumerate}
+\item Transition $Left-Arc_r$ add a dependency arc $(w_i, r, w_j)$ to the set $A$, where $w_i$ is a word on top of stack $\alpha$ and $w_j$ is the first word in buffer $\beta$. Then pop word from stack $\alpha$.
+\item Transition $Right-Arc_r$ add a dependency arc $(w_j, r, w_i)$ to the set $A$, where $w_i$ is a word on top of stack $\alpha$ and $w_j$ is the first word in buffer $\beta$. Then pop word from stack $\alpha$. Then replace $w_j$ by $w_i$ at the head of buffer. 
+\item The transition $Shift$ removes the first word $w_i$ in the buffer $\beta$ and pushes it on top of the stack $\alpha$. 
+\end{enumerate}
+
+The transitions are performed according to a set of permissible transitions in a sequence $T$. This includes a sequence of configurations $C_{0,m} = (c_0, c_1, ..., c_m)$ for sentence $S$ where:
+
+\begin{enumerate}
+\item $c_0$ is the initial configuration $c_0(S) for S$,
+\item $c_m$ is a terminal configuration,
+\item for every $i$ such that $1 \leq i \leq m$, there is a transition $t \in T$ such that $c_i = t(c_{i-1})$
+\end{enumerate}
+
+The transitions start in the initial state, and end with a dependency graph by applying valid transitions from one configuration to next. As Kubler et. al. point out:
+
+\begin{displayquote}
+Another important property of the system is that every transition sequence defines a projective \textit{dependency} forest which is advantageous from the point of view of efficiency but overly restrictive from the point of view of representational adequacy (\cite{kubler-sandra-mcdonald-ryan-nivre-book}).
+\end{displayquote}
+
+A \textit{projective} dependency graph can be defined as a graph where all the arcs have a directed path from the head word to all the words between the two endpoints of the arc. For a sentence this means that it satisfies the \textit{planar property}: that it is possible to graphically configure all the arcs in the space above a sentence without any arcs crossing (\cite{kubler-sandra-mcdonald-ryan-nivre-book}). An interesting starting point for exploring this further is the paper \textit{Shift-Reduce Dependency DAG Parsing} by Sagae and Tsujii (\cite{sagae2008shift}).
+
+% \subsubsection{Graph-Based Parsing}
+% \textit{Graph-based} dependency parsers use algorithms for directly generating a graph. This is in contrast to the \textit{transition-based} approach outlined above where the result is a graph, but the intermediate steps are transitions used to create a graph. Formally a \textit{graph-based} parser consists of a model $M = (\Gamma, \Pi, h)$, where $\Gamma$ is a set of constraints on permissible structures, $\Pi$ is a set of parameters, and $h$ is a parsing algorithm. The central aspect of \textit{graph-based} parsers is the notion of \textit{score}, which determines the likelihood of a particular graph. This is usually calculated by factoring through the scores of all possible subgraphs that the sentence can possibly produce. We will explore different \textit{graph-based} parsers in more detail in the thesis.
+
+% % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % %
+
+% % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % 
+% Chapter
+\section{Treebanks for English}
+Two types of Treebanks are usually used for dependency parsing. One is constituent trees, an example of which is the Penn Treebank, and the other is dependency Treebanks. The Prague Czech-English Dependency Treebank (PCEDT) (\cite{prague-dependency-treebank-3.0}) is a manually annotated dependency Treebank; a manually parsed English corpus with over 1.2 million running words in almost 50,000 sentences. However, this corpus is relatively new, and most of the research literature on dependency parsing use constituent trees as a basis for dependencies (\cite{johansson2007extended}). Data such as PCEDT can then be used to train a probabilistic dependency parser. 
+
+When using constituent trees for parsing, we can transform these to dependency trees by assigning each constituent in the parse tree a unique head selected amongst the constituents children (\cite{magerman1994natural}). If we use the toy grammar in Figure 2 as en example: the conversion from constituent structure to a dependency structure would involve following the child-parent links from the token level up to the root of the tree. Using this technique we can label every constituent with a head token. Here we would select the noun as the head of an NP, the verb as the head of a VP, and the VP as the head of an S consisting of a noun phrase and a verb phrase. Magerman (1994), Yamada and Matsumoto (2003) and Nivre (2006) have utilized this as the basis for writing dependency parsers that use constituent structure as an intermediate state towards a dependency structure.
+
+\begin{figure}
+\begin{lstlisting}
+NP -> DT NN*
+VP -> VBD* NP
+S -> NP VP*
+\end{lstlisting}
+\caption{A toy grammar}
+\end{figure}
+
+If we look at the constituency tree in Figure 3, we can illustrate this conversion (as an unlabeled dependency arc) as the tuple $q(H, D)$ where $H$ is the index of the word that is head and $D$ is the index of the word that is the dependent in a given sentence. Index 0 is the artificial word \textit{root} that is added so that the ``main'' word of the sentence (i.e the root of the constituency tree) is given a head. Below the constituency tree in Figure 4 we see the tuples that are derived using the conversion rules outlined by Magerman (\cite{magerman1994natural}). From those tuples we can draw a dependency structure such as the one you can see below the tuples in Figure 5. 
+
+Another method of converting a constituency tree to a dependency tree is the shift-reduce method as described in Nivre (\cite{nivre2004deterministic}) and Sagae and Tsuji (\cite{sagae2008shift}). These are parsing algorithms that convert a constituent tree to a dependency tree in linear time.
+
+\begin{figure}
+\Tree [.S(told,V) 
+		[.NP(Hillary,NNP) 
+			[.NNP Hillary ] ]
+		[.VP(told,VBD) 
+			[.V(told,VBD) [.VBD told ] ]
+			[.NP(Clinton,NNP) [.NNP Clinton ] ]
+			[.\$BAR(that,COMP) [.COMT that ] 
+				[.S(was,Vt)
+					[.NP(she,PRP) [.PRP she ] ]
+					[.VP(was,Vt) [.Vt was ] [.NP(president,NN) [.NN president ] ] ] ] ] ] ]
+\caption{Dependency tree with propagated non-terminals to parent nodes}
+\end{figure}
+
+\begin{figure}
+\begin{lstlisting}
+(0, 2) (root -> told)
+(2, 1) (told -> Hillary)
+(2, 3) (told -> Clinton)
+(2, 4) (told -> that)
+(4, 6) (that -> was)
+(6, 5) (was -> she)
+(6, 7) (was -> president)
+\end{lstlisting}
+\caption{Tuples derived from Figure 3 using the conversion rules}
+\end{figure}
+
+\begin{figure}
+\begin{dependency}[theme = simple]
+\begin{deptext}[column sep=1em]
+\textit{root} \& Hillary \& told \& Clinton \& that \& she \& was \& president \\
+\end{deptext}
+\depedge{1}{3}{}
+\depedge{3}{2}{}
+\depedge{3}{4}{}
+\depedge{3}{5}{}
+\depedge{5}{7}{}
+\depedge{7}{6}{}
+\depedge{7}{8}{}
+\end{dependency}
+
+\caption{The dependency structure derived from the tuples in Figure 4}
+\end{figure}
+
+% % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % %
+
+% % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % 
+% Chapter
+\section{Semantic Dependency Parsing - Preparing for the Thesis}
+The most common representation in dependency parsing have been \textit{trees}. A tree can be formally described as a structure where every node is reachable from a root node by exactly one directed path. This restriction does not fully capture the types of dependencies found in natural language, and is therefore not very useful when representing \textit{meaning}. As Sagae and Tsujii point out, tree representations cannot fully capture linguistic phenomena beyond shallow syntactic structures (\cite{sagae2008shift}). We mentioned Hudson's Word Grammar earlier (\cite{hudson1990english}), where he recognizes that representations of such phenomena as relative clauses, control relations, and other long-distance dependencies, can only be represented properly with more general graphs.
+
+Sagae and Tsujii explore directed acyclic graphs (DAG) to get around the restrictions posed by a tree structure. They introduce a data-driven framework for dependency parsing that produce dependency DAGs directly from an input string in a manner that is nearly as simple as the \textit{transition-based} dependency approach described earlier. In order to do this Sagae and Tsujii add two new transitions to the three mentioned above: \textit{shift, left-reduce, right-reduce}. The two new transitions are \textit{left-attach} and \textit{right-attach} (\cite{sagae2008shift}). \textit{Left-attach} creates a left dependency arc attaching the top two items on the stack, making the top item the head of the item below it (if there already is no arc between them). The action is similar to \textit{shift-reduce}, but no item is removed from the stack. \textit{Right-attach} creates a right dependency arc between the top two items on the stack (if there is no arc already), making the top item a dependent of the item below, and then it pops the top item on the stack and places it back on the list of input words (\cite{sagae2008shift}).
+
+The work of Sagae and Tsujii has been expanded upon by Ribeyre, Clergerie, and Seddah. They developed two transition-based semantic dependency parsers that where an entrance in the SDP-2014 Shared Tasks on broad-coverage semantic dependency parsing. Their approach was to explicitly focus on handling non-planar acyclic graphs by providing their models with lexical and syntacic features such as word clusters, lemmas, and tree fragments of different types. 
+
+A more recent approach to semantic dependency parsing is the approach by Kanerva, Luotolahti and Ginter, which was an entrance in the SDP-2014 Shared Tasks on broad-coverage semantic dependency parsing, and ranked third with an overall $F_1$-score of 80.49\%. The parser is a pipeline of three support vector machine classifiers that where trained separately for detecting semantic dependencies, assigning their roles, and selecting the top nodes of semantic graphs (\cite{Turku}).Their findings showed that, in addition to basic features used in classification, additional information such as the frequencies of syntactic n-grams, vector space models for calculating word similarities, can increase the overall accuracy of the parser.
+
+\subsection{State of the Art Parsers}
+SDP-2014 and  SDP-2015 present several state of the art semantic dependency parsers (\cite{semeval2014}; \cite{semeval2015}). The parsers in these two articles will lay the foundation for the work we will do in our thesis. The actual work is presented in the next section. Here we will look at some of the parsers mentioned in the two SDP articles. 
+
+Common to the two SDP articles are two target representations used for representing the semantic dependencies, and one target representation where changes occured from 2014 to 2015. The target representations from 2014 are DM: DELPH-IN MRS-Derived Bi-Lexical Dependencies and PAS: Enju Predicate-Argument Structures (which are both also in 2015) and PCEDT: Prague Tectogrammatical Bi-Lexical Dependencies, which is not in 2015. The additional target representation from 2015 is PSD: Prague Semantic Dependencies. All target representations in borth SDP 2014 and SDP 2015 are annotations of the same texts: Section 00-21 of the Wall Street Journal Corpus. The SDP target representations also aim to be task- and domain-independent. See Oepen et. al. for more details on the representations (\cite{semeval2014}; \cite{semeval2015}).
+
+The problem outlined in the SDP papers is to recover sentence-internal predicate-argument relationships for all \textit{content words}, so that the relational core of each sentence is part of the parsed result. The systems that where part of the SDP tasks where evaluated based accuracy of with which they could produce semantic dependency graphs in comparison to the gold-standard testing data. The measures where labeled and unlabeled precision and recall of predicted dependencies, and labeled and unlabeled exact match of complete graphs. The tasks where subdivided into closed and open tracks, where the former entailed that parsers could only be trained on the gold-standard semantic dependencies distributed for the task, whereas the latter could use additional resources. For details on the performance of various parsers the reader is referred to the two papers (\cite{semeval2014}; \cite{semeval2015}). 
+
+Most of the parsers in SDP-2014 used an algorithm to process graph structures and then apply some machine learning. The methods for processing graphs where divided into three types (\cite{semeval2015}:
+
+\begin{enumerate}
+\item Convert the graph into a tree as a preprocessing step. Then apply a conventional dependency parsing system to the converted trees. Some parsers would then just output the results of the conventional dependency parser, while others would include a post-processing to retain potential non-tree structures. 
+\item Use a parsing algorithm that can directly generate a graph-structure. This type of algorithm is described above in the section on transition-based parsing. 
+\item Using a more machine learning method such as using classifiers or scoring methods and find the highest-scoring graph by some decoding method. 
+\end{enumerate}
+
+Many SDP-2015 parsers where based on the methods outlined above. The Peking parser used a novel method for graph-to-tree transformations where the trees would end up with weighted edges. The Turku parser applied a method that consiedered each predicate separately. In this method the task is reduced to assigning each word an argument, or a 'pseudo-'label indicating it is not an argument of the target predicate. We will examine a set of the parsers from SDP-2014 and SDP-2015 in the thesis, and more in-depth analysis of each parser will be dealt with in due time.
+
+
+% % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % %
+
+% % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % 
+% Chapter
+\section{The project - Planning for the Thesis}
+
+In discussion with my supervisor Stephan Oepen, we have set three tasks that will function as the experimental basis for the thesis. These include an \textit{Interactive In-Depth Error Analysis} of a chosen set of results from the SDP-2014 and SDP-2015 Shared Tasks on broad-coverage semantic dependency parsing, \textit{Predicting Semantically Vacuous Nodes}, and \textit{Frame Identification}. We will explain the goals and expected results from these three tasks below.
+
+\subsection{Interactive In-Depth Error Analysis}
+The SDP2014 and SDP2015 shared tasks present the results of 12 semantic dependency parsers trained and tested on three target representations (for more details see: \cite{semeval2014}; \cite{semeval2015}). The goals of such interactive in-depth error analysis is to examine what might be weaknesses and strengths in the dependency parsers, and what possible correlations these might have in relation to the linguistic target representations of the data-sets used for training and testing. The system results presented in the two papers mentioned have yet to be examined in a rigorous scientific manner. To do so we propose a methodology and tool for contrastive "data-mining", i.e. in-depth error analysis along a set of dimensions that can be changed interactively. Due to the fact that these parsers show similar performance in terms of their overall accuracy even though they are based upon different implementations, there is reason to believe that understanding the strenghts and weaknesses of different implementations can help in creating better parsers. 
+
+The practical aspect of this task will be explored heuristically so to balance preconceptions of where we might suceed in our analysis. However, a focal point of departure will be to use the methods that have been utilised when doing similar contrastive analysis on syntactic dependency parsers. We will start by examining the points used by McDonald and Nivre (\cite{mcdonald-nivre-error-analysis}) in their contrastive analysis on a set of syntactic dependency parsers. These include (1) length factors: (i) the length of the sentence, (ii) the length of the dependency arcs, (2) the structure of the predicted and gold standard dependency graphs, such as measuring accuracy for arcs relative to their distance to the artificial root node, (3) examining linguistic factors such as parts of speech and dependency types (\cite{mcdonald-nivre-error-analysis}).
+
+\subsection{Predicting Semtically Vacuous Nodes}
+The three target representations in the SDP2014 and SDP2015 shared tasks leave a proportion of the nodes (i.e. input tokens) as semantically vacuous: they are interpreted as having no impact of on meaning and are thus left unconnected in the semantic dependency graphs. As my supervisor Stephan Oepen pointed out, there has been no systematic study to compare and align the choices of semantically vacuous nodes across target representations. We can see form the SDP2014 and SDP2015 papers that there are substantial differences in the numbers of such vacuous nodes, pointing to linguistic differences across the target representations (\cite{semeval2014}; \cite{semeval2015}). The question posed in this part of our thesis is how to best identify these vacuous nodes. Should the identification be a side-effect of the parsing itself, where vacuous nodes end up with no in- and out-degrees, or can this process be done as a pre-processsing step. My supervisor has suggest that the latter could be done using pointwise classification or sequence labeling approaches, where the features for training would be observable properties such as surface form, lemma, part of speech tags, and possibly syntactic dependencies of individual tokens and their surrounding context. 
+
+\subsection{Frame Identification}
+For the SDP2015 shared tasks, for two of the three target representations, frame (or sense) identifiers were added as part of the parsing task. Such frame identifiers are needed for certain type sof semantic interpretations. Frame indentification is closely related to Semantic Role Labeling (SRL), and is focused on resolving predicate sense into a frame and parsing the frame's arguments (\cite{frame-identification}). This classification problem can be done either as a pre-processing stage before parsing, or as a post-processing step on parser outputs. As there is more plausable grounds for doing this as a post-processing step (having access to the parser output), weil will use the top-performing parsers from the SDP2015 shared tasks and build upon these. 
+% % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % %
+
+
+% % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % 
+% Chapter
+\section{Concluding Remarks}
+In this essay we have presented our thesis: the goals and expected outcomes. We have briefly examined the history of dependency grammar, and how this relates to dependency parsing in general. We then examined dependency parsing and its various traditions, looking at both grammar-driven and data-driven approaches, and looked at data that can be used as basis for training a data-driven dependency parser. After having established the background for our thesis, we examined some state-of-the-art dependency parsing techniques and laid the foundation for what we will attempt to explore in our thesis.
+
+% % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % 
+
+\printbibliography
+\end{document}
