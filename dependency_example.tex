@@ -24,3 +24,23 @@
     \caption{Eksempel på dependensgrafrepresentasjon av en setning fra NDT}
     \label{exndt}
 \end{figure}
+
+\begin{figure}
+    \begin{dependency}[]
+        \begin{deptext}[column sep=1em, row sep=.1ex]
+            Bob \& brought \& the \& cake \& to \& Alice \& . \\
+            \texttt{NNP} \& \texttt{VBD} \& \texttt{DT} \&
+            \texttt{NN} \& \texttt{IN} \& \texttt{NNP} \&
+            \texttt{punct} \\
+        \end{deptext}
+        \deproot{2}{Root}
+        \depedge{2}{1}{nsubj}
+        \depedge{2}{4}{obj}
+        \depedge{4}{3}{det}
+        \depedge{2}{5}{prep}
+        \depedge{5}{6}{pobj}
+        \depedge[edge unit distance=2ex]{2}{7}{punct}
+    \end{dependency}
+    \caption{An example of a dependency graph}
+    \label{exndt}
+\end{figure}
