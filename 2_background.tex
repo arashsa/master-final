@@ -13,7 +13,28 @@ The sentence is an \textit{organized whole}; its constituent parts are the \text
 It is these \textit{connections}, according to \citeauthor{Tes:15}, that make a sentence meaningful: \say{[W]ithout them the sentence would not be intelligible} \cite{Tes:15}. From the works of \citeauthor{Tes:15}, the field of dependency grammar has grown into a wide range of traditions that have explored the notion of \textit{dependency} from a variety of different perspectives. Among these are the Prague School's Functional Generative Description, Meaning-Text Theory, and Hudson's Word Grammar \cite{Sgall:86, Mel:88, Hudson:90}. We will not give a detailed exposition on the differences and similarities between the various approaches to dependency grammar, but rather focus on the aspects that are informative as a precursor to our section on dependency parsing. What follows is a concise and formal definition of dependency grammar and a set of criteria that can be used for determining the connections between the words in a sentence.
 
 \subsection{A formal description}
-A \textit{dependency} can be described as a binary asymmetrical relation between the lexical units of a sentence, i.e. an arrow pointing from one word to another. Formally, we describe the dependencies in a sentence $\vec{w} = w_1 ... w_n$ as a directed graph on the set of positions $\vec{w}$ that contain an edge $i \rightarrow j$ if and only if $w_j$ depends on $w_i$ \cite{Kuhl:10}. A directed graph is used so as to represent a dependency going from one word to another. The common terms used in the research literature for the lexical unit that the arrow starts from is head \textit{H}, and the one that is pointed to as dependent \textit{D}.
+A \textit{dependency} can be described as a binary asymmetrical relation between the lexical units of a sentence, i.e. an arrow pointing from one word to another. Formally, we describe the dependencies in a sentence $\vec{w} = w_1 ... w_n$ as a directed graph on the set of positions $\vec{w}$ that contain an edge $i \rightarrow j$ if and only if $w_j$ depends on $w_i$ \cite{Kuhl:10}. A directed graph is used so as to represent a dependency going from one word to another. We can think of this as an arrow from one word to another. The common terms used in the research literature for the lexical unit that the arrow starts from is \textit{head}, and the one that is pointed to as \textit{dependent}. 
+
+In addition there can be a \textit{label} added to the \textit{dependency} defining the type of connection that exists between a head and a dependent. There is no unified set of labels for dependency parsing, and a wide variety of different schemes exist in accordance with an underlying theoretical framework. Examining the dependency graph in figure \ref{dep1} we can visualise the formal description thus far: we have a lexical element that is the \textit{root} of the sentence, the verb "brought", and several \textit{labeled dependencies} between a \textit{head} and a \textit{dependent}. An example is the connection made between the verb "brought" and the noun "Bob", with the verb being the \textit{head} and the noun being the \textit{dependent}, with a \textit{labeled dependency} of type "nsubj".
+
+\begin{figure}
+    \begin{dependency}[]
+        \begin{deptext}[column sep=1em, row sep=.1ex]
+            Bob \& brought \& the \& cake \& to \& Alice \& . \\
+        \end{deptext}
+        \deproot{2}{Root}
+        \depedge{2}{1}{nsubj}
+        \depedge{2}{4}{obj}
+        \depedge{4}{3}{det}
+        \depedge{2}{5}{prep}
+        \depedge{5}{6}{pobj}
+        \depedge[edge unit distance=2ex]{2}{7}{punct}
+    \end{dependency}
+    \caption{An example of a dependency graph with labeled edgess.}
+    \label{dep1}
+\end{figure}
+
+The criteria for establishing \textit{dependencies}, and defining which lexical unit should be head and dependent is of central concern to dependency grammar. In the case where the \textit{dependency} relations have labels, the type of labels used are also taken into consideration, and a set of criteria are used in deciding these labels. 
 
 
 
@@ -26,3 +47,8 @@ A \textit{dependency} can be described as a binary asymmetrical relation between
 
 
 \section{Semantic Dependency Parsing}
+
+
+
+
+
