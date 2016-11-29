@@ -187,7 +187,6 @@ The first two use a model with an underlying string (described by the WBG) and a
 
 A data-driven dependency parser can formally be described as a model $M = (\Gamma, \Pi, h)$ where $\Gamma$ is a set of constraints that define the space of permissible structures for a given sentence, $\Pi$ is a set of parameters that are learned from data, and $h$ is a parsing algorithm. As mentioned previously, there are mainly two classes of data-driven dependency parsers: \textit{transition-based} and \textit{graph-based}. For porpuses of our thesis we will only examine \textit{transition-based} parsing techniques.
 
-
 \subsubsection{Transition-Based Parsing}
 A \textit{transition-based} parser consists of a set of \textit{configurations} (or \textit{states}) that include a set of \textit{transitions}. In this section we will focus on a simple \textit{stack-based} \textit{transition based} system that is widely used and is based on \textit{shift-reduce} parsing (\cite{kubler-sandra-mcdonald-ryan-nivre-book}). We can describe such a parser by way of a \textit{configuration} of triples consisting of a stack, an input buffer, and a set of dependency arcs. Given a set $R$ of dependency types, a \textit{configuration} for sentence $S = w_0w_1, ..., w_n$ is a triple $c = (\alpha, \beta, A)$, where:
 
