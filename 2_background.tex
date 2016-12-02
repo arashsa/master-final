@@ -1,11 +1,11 @@
 \chapter{Background}
 \label{chap:background}
 
-This chapter provides an introduction to dependency grammar and reviews the state-of-the-art in dependency-based parsing. We start by exploring dependency grammar in order to provide the reader with some background, and to formally define a set of properties that will be used as basis for our thesis. We then examine two main approaches to dependency-based parsing: the \textit{grammar-driven} and the \textit{data-driven} approach. However, grammar-driven and data-driven approaches to dependency parsing are not mutually exclusive, and as we shall see, there are approaches that rely on both. Our focus in this chapter will be on data-driven approaches to dependency parsing. This is due to our observation that most of the recent research on dependency-based parsing use a data-driven approach. In addition, the analysis that we present in chapter \ref{chap:analysis} are based on data-driven parsers, and our experiments in chapter \ref{chap:experiments}, rely on data-driven methods.
+This chapter provides an introduction to dependency grammar and reviews the state-of-the-art in dependency-based parsing. We start by exploring dependency grammar in order to provide the reader with some background, and to formally define a set of properties that will be used as basis for our thesis. We then examine two main approaches to dependency-based parsing: the \textit{grammar-driven} and the \textit{data-driven} approach. However, grammar-driven and data-driven approaches to dependency parsing are not mutually exclusive, and as we shall see, there are approaches that rely on both. Our focus in this chapter will be on data-driven approaches to dependency parsing. This is due to our observation that most of the recent research on dependency-based parsing use a data-driven approach. In addition, the analysis that we present in chapter \ref{chap:analysis} are based on data-driven parsers, and our experiments in chapter \ref{chap:experiments} rely on data-driven methods.
 
 We differentiate dependency-based parsing into two classes: \textit{syntactic dependency parsing} and \textit{semantic dependency parsing}. As a superficial starting point we can state that the dependency relations in the former are represented predominantly as \textit{tree} data structures in the research community, while the latter are represented as \textit{graph} data structures. In section \ref{syntactic-semantic} we examine the hypothesis that tree-based data structures are best suited for the analysis of grammatical structure, but often lack the expressiveness needed to capture sentence semantics. We will argue for the need to move towards more general graph-based dependency parsing due to the limitations that tree-based parsing imposes on meaning representation.
 
-In order to simplify our discussion, we will use the term dependency graph in section \ref{grammar} on dependency grammar, even though what we are discussing may be defined, strictly speaking, as a tree. We do this based on two assumptions:
+When we explore dependency grammar in section \ref{grammar}, we will for the sake simplicity use the term graph even when we may, strictly speaking, refer to a tree. This is based on two assumptions:
 
 \begin{enumerate}
 \item A tree can be defined as an acyclic directed graph; all possible trees are a subset of all possible graphs.
@@ -56,7 +56,7 @@ If we examine the dependency between the verb `brought' and the noun `Bob': we s
 \subsection{Criteria for Dependencies}
 \label{criteria}
 
-The criteria for establishing the dependencies in a sentence, i.e. determining which lexical units should be head and dependents in a sentence, are of central concern to dependency grammar. \citeauthor{Niv:05} proposes a set of criteria, with reference to \citeauthor{Zwicky:85} and \citeauthor{Hudson:90}, for establishing dependencies and determining the head \textit{H} and dependent \textit{D} in a construct \textit{C} \cite{Zwicky:85, Hudson:90, Niv:05}:
+The criteria for establishing the dependencies, i.e. determining which lexical units should be head and dependents in a sentence, are of central concern to dependency grammar. \citeauthor{Niv:05} proposes a set of criteria, with reference to \citeauthor{Zwicky:85} and \citeauthor{Hudson:90}, for establishing dependencies and determining the head \textit{H} and dependent \textit{D} in a construct \textit{C} \cite{Zwicky:85, Hudson:90, Niv:05}:
 
 \begin{enumerate}
 \item (\textit{H}) determines the syntactic category of (\textit{C}) and can often replace (\textit{C}).
@@ -67,7 +67,7 @@ The criteria for establishing the dependencies in a sentence, i.e. determining w
 \item The position of (\textit{D}) is specified in relation to (\textit{H}).
 \end{enumerate}
 
-Different traditions of dependency grammar diverge in the interpretation and use of a specific set of criteria for identifying dependencies. The list above encompasses a set of syntactic and semantic criteria for establishing dependencies, and there have been attempts at providing a single coherent notion of dependency that include all of the criteria above. \citeauthor{Hudson:90} has proposed the usage of the concept of a prototype structure that satisfy all or most of the criteria above, and then using special cases for dependencies that only satisfy one or few criteria \cite{Hudson:90}. \citeauthor{Mel:88} has proposed a set of three dependency types: \textit{morphological}, \textit{syntactic}, and \textit{semantic} \cite{Mel:88}. \citeauthor{Nikula:86} has proposed two categories of constructions, \textit{endocentric} and \textit{exocentric}, for determining dependencies \cite{Nikula:86}. \textit{Valency} is another term that is used as criteria for determining dependencies. We will now define the terminology thus far, and add additional terms that are used in the subsequent chapters insofar as they relate to dependency grammar.
+Different traditions of dependency grammar diverge in their interpretation and use of a specific set of criteria for identifying dependencies. The list above encompasses a set of syntactic and semantic criteria for establishing dependencies, and there have been attempts at providing a single coherent notion of dependency that include all of the criteria above. \citeauthor{Hudson:90} has proposed the usage of the concept of a prototype structure that satisfy all or most of the criteria above, and then using special cases for dependencies that only satisfy one or few criteria \cite{Hudson:90}. \citeauthor{Mel:88} has proposed a set of three dependency types: \textit{morphological}, \textit{syntactic}, and \textit{semantic} \cite{Mel:88}. \citeauthor{Nikula:86} has proposed two categories of constructions, \textit{endocentric} and \textit{exocentric}, for determining dependencies \cite{Nikula:86}. \textit{Valency} is another term that is used as criteria for determining dependencies. We will now define the terminology thus far, and add additional terms that are used in the subsequent chapters insofar as they relate to dependency grammar.
 
 \paragraph{Endocentric Construction} This is a term used for constructions where the dependent is optional and not selected by its head, and where the head can replace the whole without affecting the syntactic structure of the sentence. In terms of the categories above, they are all endocentric with the exception of number 4. \cite{KublerEtAl:09}. The term \textit{head-modifier} is often used in the research literature to describe a construct where the head modifies the dependent either syntactically or semantically. Head-modifer constructs usually fall within the definition of an endocentric construction \cite{Niv:05}.
 
@@ -75,7 +75,33 @@ Different traditions of dependency grammar diverge in the interpretation and use
 
 \paragraph{Valency} The term \textit{valency} is used to determine the distinction between complements and modifiers. In most theoretical frameworks the term valency is used in relation to the semantic predicate-argument structure that is associated with verbs, nouns and adjectives (for the most part). It is used as a way to describe a construct where the lexeme impose some type of requirement on its dependent that determines how to interpret it as a semantic predicate \cite{Niv:05}.
 
-\paragraph{Projectivity} This is a technical term that sets a boundary on the type of dependencies that are permissible in a graph. This restriction will be important when discussing dependency parsing in section \ref{parsing}. A dependency graph is projective if and only if for all its edges $w_i \rightarrow w_j$ in a sentence $\vec{w} = w_1 ... w_n$, they adhere to the restriction that if $w_i \rightarrow w_k$ then $i < k < j$ when $i < j$, or $j < k < i$ when $j < i$ \cite{KublerEtAl:09}.
+\paragraph{Projectivity} This is a technical term that sets a boundary on the type of dependencies that are permissible in a graph. This restriction will be important when discussing dependency parsing in section \ref{parsing}. A dependency graph is projective if and only if for all its edges $w_i \rightarrow w_j$ in a sentence $\vec{w} = w_1 ... w_n$, they adhere to the restriction that if $w_i \rightarrow w_k$ then $i < k < j$ when $i < j$, or $j < k < i$ when $j < i$ \cite{KublerEtAl:09}. We can see the difference by examining figure \ref{projective}, where we have a projective graph, and a non-projective graph in figure \ref{non-projective}.
+
+\begin{figure}
+    \begin{dependency}[hide label]
+        \begin{deptext}[column sep=1em, row sep=.1ex]
+        $w_0$ \& $w_1$ \& $w_2$ \& $w_3$ \\
+        \end{deptext}
+        \depedge{1}{3}{}
+        \depedge{3}{2}{}
+        \depedge{3}{4}{}
+    \end{dependency}
+    \caption{A projective dependency graph.}
+    \label{projective}
+\end{figure}
+
+\begin{figure}
+    \begin{dependency}[hide label]
+        \begin{deptext}[column sep=1em, row sep=.1ex]
+        $w_0$ \& $w_1$ \& $w_2$ \& $w_3$ \\    
+        \end{deptext}
+        \depedge[edge unit distance=2.1ex]{1}{3}{}
+        \depedge{3}{4}{}
+        \depedge{4}{2}{}
+    \end{dependency}
+    \caption{A non-projective dependency graph.}
+    \label{non-projective}
+\end{figure}
 
 \paragraph{Single-head constraint} This term is used to define a constraint where the dependents in a sentence are prohibited from having more than one head. This limitation reduces the flexibility of a dependency graph, and as we shall see in section \ref{syntactic-semantic} on syntactic and semantic dependency parsing, the constraint reduces the possibilities of capturing certain semantic information.\\
 
@@ -112,11 +138,7 @@ If the recent research on dependency-based parsing is an indication of where we 
 \subsection{Data-Driven Approaches}
 \label{data-driven}
 
-Early attempts at data-driven dependency parsing were post-processing steps for disambiguation: taking the multiple outputs of a grammar-driven approach and reaching a final dependency structure by choosing the most likely structure. The disambiguation part consisted of a model trained using a statistical model, or a machine learning algorithm, trained on manually annotated corpora. It is due to this usage a corpora the name data-driven stems from.
-
-% Niv:05, 19
-
-\citeauthor{Eisner:96a} was one of the early developers of an approach that did not rely on a grammar-driven part to reach a dependency structure. He presents three models for flexible probabilistic parsing that assigns both \textit{part-of-speech} tags, and a bare-bones dependency structure without labels, to a sentence. The parser is trained on sentences from the \textit{Wall Street Journal}. Examining the first model that \citeauthor{Eisner:96a} proposes, it is based a Markov process where each pair of words in a sentence is examined, and the probability that a dependency is made between word $i$ and $j$ depends on the (tag, word) pairs at both $i$ and $j$. The other two models are variations on this Markov learning approach. The algorithm used for the parsing is one that is similar to the CKY method mentioned above \cite{Eisner:96a}.
+Early attempts at data-driven dependency parsing where grammar-driven in the sense that they relied on a formal grammar to produce multiple dependency graphs, and used data to induce probabilistic models for disambiguation \cite{Niv:05}. After these initial attempts, the research moved towards fully data-driven approaches where the dependency graph is induced from a model without any explicitly defined grammar. In our thesis, we focus on two classes of data-driven parsers: \textit{transition-based} and \textit{graph-based}. The transition-based approach, also commonly referred to as \textit{shift-reduce dependency parsing}, are based on \textit{finite state machines} for mapping a sentence to a dependency graph. The learning aspect of this approach is to learn local transition states: a model for predicting the next state given previous states. The parsing then uses this model to construct the most optimal sequence of transitions for a given sentence. The graph-based approach to parsing, also known as \textit{maximum spanning tree} parsing, create a space of possible dependency graphs for a given sentence. This approach to learning is global, 
 
 
 \section{Syntax and Semantics}
