@@ -1,10 +1,9 @@
 \chapter{Broad Coverage Semantic Dependency Parsing with Frames}
 \label{chap:parsing}
 
-\citeauthor{Sagae:Tsuji:08} explore directed acyclic graphs (DAGs) as a way to get around the restrictions posed a tree structures. They introduce a data-driven approach to dependency parsing where DAGS are produced directly from an input string by introducing a modified version of the transition-based model described in section \ref{data-driven}. Two new transitions are introduced to the three transitions mentioned above: \textit{left-attach} and \textit{right-attach} \cite{Sagae:Tsuji:08}. These transitions can be described informally as:
+% \citeauthor{Sagae:Tsuji:08} explore directed acyclic graphs (DAGs) as a way to get around the restrictions posed a tree structures. They introduce a data-driven approach to dependency parsing where DAGS are produced directly from an input string by introducing a modified version of the transition-based model described in section \ref{data-driven}. Two new transitions are introduced to the three transitions mentioned above: \textit{left-attach} and \textit{right-attach} \cite{Sagae:Tsuji:08}. These transitions can be described informally as:
 
-\begin{enumerate}
-\item Left-Attach: add a dependency arc $(w_i, r, w_j)$ to the set $A$ between the top two items on the stack $\alpha$, making the top item $w_i$ the head and the item below it $w_j$ the dependent, if and only if there is no arc between them already.
-\item Right-Attach: add a dependency arc $(w_i, r, w_j)$ to the set $A$ between the top two items on the stack $\alpha$, making the top item $w_i$ the dependent and the item below it $w_j$ the head, if and only if there is no arc between them already. Remove the top item on the stack $\alpha$ and place it back on the buffer $\beta$.
-\end{enumerate}
-
+% \begin{enumerate}
+% \item Left-Attach: add a dependency arc $(w_i, r, w_j)$ to the set $A$ between the top two items on the stack $\alpha$, making the top item $w_i$ the head and the item below it $w_j$ the dependent, if and only if there is no arc between them already.
+% \item Right-Attach: add a dependency arc $(w_i, r, w_j)$ to the set $A$ between the top two items on the stack $\alpha$, making the top item $w_i$ the dependent and the item below it $w_j$ the head, if and only if there is no arc between them already. Remove the top item on the stack $\alpha$ and place it back on the buffer $\beta$.
+% \end{enumerate}
