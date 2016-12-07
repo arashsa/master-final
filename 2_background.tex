@@ -43,6 +43,7 @@ The common term used in the research literature for the lexical unit that stands
 If we examine the dependency graph in figure \ref{dep1}, we can visualise the description above: the verb `brought' that is the entry-point of the graph, the artificially added unit \textit{root} that acts as the verbs head, and several labeled dependencies between the heads and dependents in the sentence. If we examine the dependency between the verb `brought' and the noun `Bob': we see that the head of this dependency is the verb `brought', the dependent is the noun `Bob', and the edge that connects them has the label `subj'. The label in this example is used to encode syntactic information: `Bob' acts as the nominal subject of the copula verb `brought'. Now that we have briefly defined the dependency graph, we turn our attention to a set of criteria that has been proposed for determining heads and dependents in a sentence.
 
 \begin{figure}
+    \centering
     \begin{dependency}[]
         \begin{deptext}[column sep=1em, row sep=.1ex]
             Bob \& brought \& the \& cake \& to \& Alice \& . \\
@@ -86,6 +87,7 @@ Different traditions of dependency grammar diverge in their interpretation and u
 \paragraph{Projectivity} This is a technical term that sets a boundary on the type of dependencies that are permissible in a graph. A dependency graph is projective if and only if for all its edges $w_i \rightarrow w_j$ in a sentence $\vec{w} = w_1 ... w_n$, they adhere to the restriction that if $w_i \rightarrow w_k$ then $i < k < j$ when $i < j$, or $j < k < i$ when $j < i$ \cite{KublerEtAl:09}. We can see the difference by examining the projective graph in figure \ref{projective}, and the non-projective graph in figure \ref{non-projective}.
 
 \begin{figure}
+    \centering
     \begin{dependency}[hide label]
         \begin{deptext}[column sep=1em, row sep=.1ex]
         $w_0$ \& $w_1$ \& $w_2$ \& $w_3$ \\
@@ -99,6 +101,7 @@ Different traditions of dependency grammar diverge in their interpretation and u
 \end{figure}
 
 \begin{figure}
+    \centering
     \begin{dependency}[hide label]
         \begin{deptext}[column sep=1em, row sep=.1ex]
         $w_0$ \& $w_1$ \& $w_2$ \& $w_3$ \\    
