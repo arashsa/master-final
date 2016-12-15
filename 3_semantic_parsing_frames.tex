@@ -1,19 +1,150 @@
 \chapter{Semantic Dependency Parsing with Frames}
 \label{chap:semantic}
 
-This chapter examines the state-of-the-art in semantic dependency parsing. 
+This chapter presents the state-of-the-art in semantic dependency parsing. More specifically, we will focus on what \citeA{Oepen:15} define as \textit{Broad Coverage Semantic Dependency Parsing}, that they define as
 
+\begin{displayquote}
+... [T]he problem of recovering sentence-internal pre
+\end{displayquote}
 
-\section{Representations}
+As we touched upon in Chapter \ref{chap:background}, the target representations used in the research on syntactic dependency parsing, and the results that such parsers are able to produce, have been largely limited to tree data structures. A tree can be defined as an acyclic directed graph, i.e. every node is reachable from a root node by exactly one directed path. This structure impose certain restrictions, such as a unique root, connectedness, and lack of reentries (single-head constraint). 
+
+The restrictions that trees impose limit certain aspects of semantic analysis, such lexical units with multiple heads, or when it would be advantageous to leave certain semantically void lexemes outside of the dependency structure. In order to mitigate the restrictions imposed by tree-based parsing, efforts have been made to develop graph-structured representations. Parsing techniques have been developed that can be trained on target representations where the annotations are graphs instead of trees. These parsing techniques are thus capable of producing dependency structures that are better apt at capturing sentence semantics than tree-based parsers.
+
+In this chapter we will focus our attention on the 2014 and 2015 shared tasks on Broad-Coverage Semantic Dependency Parsing (SDP) \cite{Oepen:14, Oepen:15}. The two shared tasks have provided a large annotated corpora in 4 different annotation schemes available for training and testing. These are annotations on the Wall Street Journal (WSJ) corpus of the Penn Treebank (PTB) \cite{Mar:San:Mar:93} for the SDP 2014, and the added Brown corpus of the same Treebank for the SDP 2015.
+
+Several researchers submitted their results to the two shared tasks, with many achieving state-of-the-art results in their submissions. We will first examine the target representations made available for the SDP 2014 and 2015 shared tasks, and then move on to a presentation of the technical aspects of the submission and results of the participating teams.
+
+The SDP tasks of 2015 also include annotated corpora for the Czech and Chinese language. We have decided to limit our research and analysis to the English language, and will therefore not include these results in our thesis. However, it is worth mentioning that these target representations exists, and that several sumbmissions to the SDP tasks also submitted results from parsers trained on the target representations in these two languages.
+
+\section{Target Representations}
 \label{sec:representations}
 
-\paragraph{DELPH-IN MRS-Derived Bi-Lexical Dependencies (DM)} 
+Target representations are an integral part of data-driven parsing. They are the foundation on which data-driven parsers are trained in order to predict the most plausible dependency structure for a given sentence. The four distinct representations we will examine use different annotation schemes. The first three representations we will examine are called DM, PAS and PCEDT, which where used for the SDP 2014 shared tasks. For the SDP 2015 task, the PCEDT target representation was replaced by PSD, and so-called \textit{Frames} where added to the DM and PSD representations. We give provide a presentation of frames in Section \ref{sec:frames}. In Tables \ref{DM}, \ref{PAS}, \ref{PCEDT} and \ref{PSD} we have visually represented the annotations of DM, PAS, PCEDT and PSD on the sentence:
 
-\paragraph{Enju Predicate–Argument Structures (PAS)}
+\begin{displayquote}
+Bramalea said it expects to complete the issue by the end of the month.
+\end{displayquote}
 
-\paragraph{Prague Czech-English Dependency Treebank (PCEDT)}
+This sentence has been chosen in order to highlight certain aspects of a semantic dependency graph: lexical units that are left unattached, a few examples where a lexical unit have more than one head (breaking the so-called single-head constraint that a tree would impose), and edges that make the graph non-projective. 
 
-\paragraph{Prague Semantic Dependencies (PSD)}
+The data-sets that we will examine are all represented in the SDP format. Various approaches have been used to reach the target representations used in these data-sets, and we will now examine the way these have been constructed, and present information on their content\footnote{See \url{http://sdp.delph-in.net/2014/data.html} and \url{http://sdp.delph-in.net/2015/data.html} for the technical details on the data format of SDP 2014 and 2015 respectively.}.
+
+
+\begin{figure}
+    \centering
+    \smaller[]
+    % \smaller[]
+    \begin{dependency}[]
+        \begin{deptext}[column sep=0.5em, row sep=.1ex]
+            Bramalea \& said \& it \& expects \& to \& complete \& the \& issue \& by \& the \& end \& of \& the \& month \& . \\
+        \end{deptext}
+        \depedge[edge unit distance=1.4ex]{2}{11}{TWHEN}
+        \deproot[edge unit distance=4ex]{2}{root}
+        \depedge[edge unit distance=1.5ex]{4}{14}{APP}
+        \depedge[edge unit distance=0.7ex]{2}{8}{PAT}
+        \depedge[edge unit distance=1.4ex]{11}{6}{PAT}
+        \depedge[edge unit distance=1.4ex]{6}{1}{ACT}
+        \depedge[edge unit distance=1.2ex]{11}{3}{ACT}
+        \depedge[edge unit distance=.8ex]{6}{4}{EFF}
+    \end{dependency}
+    \caption{PCEDT representation.}
+    \label{PCEDT}
+\end{figure}
+
+\begin{figure}
+    \centering
+    \smaller[]
+    % \smaller[]
+    \begin{dependency}[]
+        \begin{deptext}[column sep=0.5em, row sep=.1ex]
+            Bramalea \& said \& it \& expects \& to \& complete \& the \& issue \& by \& the \& end \& of \& the \& month \& . \\
+        \end{deptext}
+        \deproot{2}{root}
+        \depedge{2}{1}{verb\_ARG1}
+        \depedge{6}{3}{verb\_ARG1}
+        \depedge{2}{4}{verb\_ARG2}
+        \depedge{4}{6}{verb\_ARG2}
+        \depedge{4}{3}{verb\_ARG1}
+        \depedge{9}{6}{prep\_ARG1}
+        \depedge{6}{8}{verb\_ARG2}
+        \depedge{5}{6}{comp\_ARG1}
+        \depedge{7}{8}{det\_ARG1}
+        \depedge[edge unit distance=5ex]{9}{11}{prep\_ARG2}
+        \depedge[edge unit distance=6ex]{10}{11}{det\_ARG1}
+        \depedge{12}{14}{prep\_ARG2}
+        \depedge{12}{11}{prep\_ARG1}
+        \depedge{13}{14}{det\_ARG1}
+    \end{dependency}
+    \caption{PAS representation.}
+    \label{PAS}
+\end{figure}
+
+\begin{figure}
+    \centering
+    \smaller[]
+    \smaller[]
+    % \tiny
+    \begin{dependency}[]
+        \begin{deptext}[column sep=0.5em, row sep=.1ex]
+            Bramalea \& said \& it \& expects \& to \& complete \& the \& issue \& by \& the \& end \& of \& the \& month \& . \\
+            named:x-c \& v\_to:e-i-h-i \& pron:x \& v:e-i-h \& \_ \& v:e-i-p \& q:i-h-h \& n:x \& p:e-u-i \& q:i-h-h \& n\_of:x-i \& \_ \& q:i-h-h \& n:x \& \_ \\
+        \end{deptext}
+        \deproot{2}{root}
+        \depedge{2}{1}{ARG1}
+        \depedge{6}{3}{ARG1}
+        \depedge{4}{3}{ARG1}
+        \depedge{2}{4}{ARG2}
+        \depedge{9}{6}{ARG1}
+        \depedge{4}{6}{ARG2}
+        \depedge{6}{8}{ARG2}
+        \depedge{7}{8}{BV}
+        \depedge{9}{11}{ARG2}
+        \depedge{10}{11}{BV}
+        \depedge{11}{14}{ARG1}
+        \depedge{13}{14}{BV}
+    \end{dependency}
+    \caption{DM representation.}
+    \label{DM}
+\end{figure}
+
+\begin{figure}
+    \centering
+    \smaller[]
+    % \smaller[]
+    \begin{dependency}[]
+        \begin{deptext}[column sep=0.2em, row sep=.1ex]
+            Bramalea \& said \& it \& expects \& to \& complete \& the \& issue \& by \& the \& end \& of \& the \& month \& . \\
+            \_ \& ev-w2833f1 \& \_ \& ev-w1239f1 \& \_ \& ev-w620f1 \& \_ \& \_ \& \_ \& \_ \& \_ \& \_ \& \_ \& \_ \& \_ \\
+        \end{deptext}
+        \deproot{2}{root}
+        \depedge{2}{1}{ACT-arg}
+        \depedge{6}{3}{ACT-arg}
+        \depedge{4}{3}{ACT-arg}
+        \depedge{2}{4}{EFF-arg}
+        \depedge{4}{6}{PAT-arg}
+        \depedge{6}{8}{PAT-arg}
+        \depedge[edge unit distance=2.1ex]{6}{11}{TWHEN}
+        \depedge{11}{14}{APP}
+    \end{dependency}
+    \caption{PSD representation.}
+    \label{PSD}
+\end{figure}
+
+\begin{displayquote}
+
+\end{displayquote}
+
+\paragraph{PCEDT: Prague Tectogrammatical Bi-Lexical Dependencies} The Prague Czech-English Dependency Treebank \cite{PCEDT}\footnote{See \url{http://ufal.mff.cuni.cz/pcedt2.0/}} is a dependency treebank over the WSJ from the PTB. The original English texts have been annotated along with annotated Czech translations. Similar to other treebanks from the PTB, the texts have been annotated with two layers of syntactic information: \textit{analytical} (a-layer) and \textit{tectogrammatical} (t-layer) \cite{Oepen:14}. The a-layer represents the so-called surface syntax, where the labels in the dependencies represent the syntactic information of the sentence. The t-layer is a layer where syntax and semantic dependencies are represented, and is based on the framework of the Functional Generative Description \cite{Sgall:86}. A conversion has been used in order to reach the SDP data format from this t-layer; see \citeA{Miyao:14} for details on the conversion from the t-layer of the PCEDT representation to the SDP representation.
+
+\paragraph{PAS: Enju Predicate–Argument Structures} The Enju representations is based on Head-driven phrase structure grammar (HPSG), and are derived from the Enju HPSG treebank, which are conversions from the phrase structure and predicate-argument representation of the PTB \cite{Oepen:14}. The PAS representation is extracted from the predicate-argument structures of the HPSDG Treebank. This predicate-argument structure represent bi-lexical semantic dependencies. As the PCEDT format, again see \citeA{Miyao:14} for the technical details on the conversion to the SDP data format.
+
+\paragraph{DM: DELPH-IN MRS-Derived Bi-Lexical Dependencies} The semantic dependency graphs of the DM format are derived from the output of ERG parser. This parser adds syntactic and semantic analysis by using the LinGO English Resource Grammar (LERG), which in a similar fashion to PAS is based on HPSG. It adds to the standard framework of HPSG by using Minimal Recursion Semantics for specifying semantic attributes, and it does not implement the binding theory of HPSG \cite{Flickinger:00}. The DM representations are derived through a two-step `lossy' conversion. The first step in this conversion is to convert the MRSs to variable-free \textit{Elementary Dependency Structures}, and then a second step is applied where some information is lost in transforming the results of the previous step to the strictly bi-lexical SDP data format \cite{Miyao:14}.
+
+\paragraph{PSD: Prague Semantic Dependencies} The PCEDT target representation is used as basis for arriving at the PSD\footnote{See \url{http://tinyurl.com/h8dfkcz} for more technical details on the PSD target representation and conversion from PCEDT.} representation by way of a conversion. The PCEDT representation consists of dependency structures that are always rooted trees, due to the technical aspects of the conversion from the t-layers to the SDP data format. For the SDP 2015 task, a conversion of the PCEDT data's t-layer was performed in order to reach true bi-lexical dependencies.\\
+
+\subsection{Frames}
+\label{sec:frames}
 
 
 \section{Parsers}
