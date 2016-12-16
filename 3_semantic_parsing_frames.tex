@@ -1,7 +1,9 @@
 \chapter{Semantic Dependency Parsing with Frames}
 \label{chap:semantic}
 
-This chapter presents the state-of-the-art in semantic dependency parsing. More specifically, we will focus on what \citeA{Oepen:15} define as \textit{Broad Coverage Semantic Dependency Parsing}:
+This chapter presents the state-of-the-art in semantic dependency parsing. The goal of semantic dependency parsing can be superficially defined as a representation of `Who did what to whom', and adding `when' and `where' to the equation. This is similar to Semantic Role Labeling (SRL), where the goal is to represent the abstract role that arguments of a predicate can take in the event \cite{Jur:Mar:09}. However, semantic dependency parsing usually has a broader scope in its representation, attempting to add various semantic phenomena, such ass negation, and other scopal dependencies that are not part of the scope of SRL.
+
+To be more specific on the goals of this chapter, we will examine what \citeA{Oepen:15} define as \textit{Broad Coverage Semantic Dependency Parsing}:
 
 \begin{displayquote}
 ... [T]he problem of recovering sentence-internal predicate-argument relationships for \textit{all} \textit{content} \textit{words}, i.e. the semantic structure constituting the relational core of sentence meaning.
@@ -148,16 +150,18 @@ The data-sets that we will examine are all represented in the SDP format\footnot
 \subsection{Frames}
 \label{sec:frames}
 
-The SDP 2015 introduced frames, also referred to as sense distinctions, to the DM and PSD target representations. The notion of frames is similar to Semantic Role Labeling (SRL), which was pionered by \citeA{}
+The SDP 2015 introduced frames, also referred to as sense distinctions, to the DM and PSD target representations. These are added as an extra layer to the sentence where multiple classes are used in order to add specific information on the content words of a sentence. If we examine the semantic dependency graphs in Figure \ref{DM} and \ref{PSD}, we see these classes below the sentence. The number of frames in DM are far lower than PSD, as we can observe in Figure \ref{fig:data}.
 
-The number of frames in DM are far lower than PSD, as you can see in Figure \ref{fig:data}. The DM frames are limited to argument structure distinctions, while PSD has a much larger scope in the sense distinctions that are captured. According to \citeA{Oepen:15}, DM is limited to causative vs. inchoative aspects in regards to the arity or coarse semantic typing of argument frames.
+According to \citeA{Oepen:16}, DM frames encode more general `linking patterns', which are mappings from syntactic to semantic arguments, whereas PSD represents actual sense identifiers and show different values for distinct lexemes. They note further that PSD only annotates senses on verbal predicates, while DM provide frame identifiers for all semantically contentful nodes. Additionally, \citeA{Oepen:15} note that the DM frames are limited to argument structure distinctions, e.g. causative vs. inchoative contrasts or differences in the arity or coarse semantic typing of argument frames. They further note that the PSD frames draw on much richer sense inventory, based on the EngValLex database \cite{Cinkova:06}.
+
+As we will see in Chapter \ref{chap:analysis}, we will focus on frames when in our own classification task in Chapter \ref{chap:experiments}. We will thus return to frames in these two chapters with a more in-depth analysis of the DM and PSD data sets, results of the parsers examined in this chapter, and a more exploratory approach to the frame classes themselves.
 
 \section{Data sets}
 \label{sec:data-sets}
 
-The data-sets for the SDP 2014 and 2015 vary slightly. In the SDP 2014, the three annotations are over the same set of texts: Sections 00-21 of the WSJ corpus. A set of sentences where excluded from the data sets where (a) no gold-standard analysis existed; (b) it was not possible to align the tokens of the on-to-one; (c) there where cycles in at least on of the graphs of a sentence. In addition to a some lack of analysis already present in the data sets, the SDP 2014 data set counts roughly 34,004 sentences (or a total of 745,543 tokens) for the training split (Sections 00-20), and 1,348 sentences (or a total of 29,808 tokens) for the test split (Section 21) \cite{Oepen:14}. The SDP 2015 shared tasks used the same data set, but added a balanced corpus from the Brown Corpus. Also, the DM graphs where extracted from a later and improved release of the DeepBank (version 1.1). The exclusion of sentences from the data sets where a bit lower for SDP 2015, and the training set counts 35,657 sentences (or a total of 802,717 tokens; roughly eight percent more than for SDP 2014). For the test set 1,410 sentences (or a total of 31,948 tokens) from the WSJ Section 21 was reserved for in-domain testing, and 1,849 sentences (or a total of 31,583 tokens) was reserved for out-of-domain testing from the Brown Corpus \cite{Oepen:15}.
+The data-sets for the SDP 2014 and 2015 vary slightly. In the SDP 2014, the three annotations are over the same set of texts: Sections 00-21 of the WSJ corpus. A set of sentences where excluded from the data sets where (a) no gold-standard analysis existed; (b) it was not possible to align the tokens of each sentence on-to-one for all three representations; (c) there where cycles in at least on of the graphs of a sentence. After this cleanup, the SDP 2014 data set counts 34,004 sentences (or a total of 745,543 tokens) for the training split (Sections 00-20), and 1,348 sentences (or a total of 29,808 tokens) for the test split (Section 21) \cite{Oepen:14}. The SDP 2015 shared tasks used the same data set, but added a balanced corpus from the Brown Corpus. Also, the DM graphs where extracted from a later and improved release of the DeepBank (version 1.1). The exclusion of sentences from the data sets where a bit lower for SDP 2015, and the training set counts 35,657 sentences (or a total of 802,717 tokens; roughly eight percent more than for SDP 2014). For the test set 1,410 sentences (or a total of 31,948 tokens) from the WSJ Section 21 was reserved for in-domain testing, and 1,849 sentences (or a total of 31,583 tokens) from the Brown Corpus was reserved for out-of-domain testing \cite{Oepen:15}.
 
-In Figure \ref{fig:data} we present some high-level statistics on the SD 2015 data set that have been reproduced from \citeA{Oepen:15}. We exclude the 2014 SDP data set, as we are only interested in the results from the 2015 SDP tasks. In Chapter \ref{chap:analysis} we follow the same suit and focus solely on the SDP 2015 results in our contrastive analysis of the contributions and results.
+We exclude the 2014 SDP data set when we further explore the data sets. We will focus on the results from the 2015 SDP tasks due to the fact that this is an extension of the previous year, but also due to the increase in overall performance from the participating research teams. In Chapter \ref{chap:analysis} we follow the same suit and focus solely on the SDP 2015 results in our contrastive analysis of the best scoring submissions.
 
 \begin{table}
     \centering
@@ -207,8 +211,12 @@ In Figure \ref{fig:data} we present some high-level statistics on the SD 2015 da
 %     \label{fig:data-in-domain}
 % \end{table}
 
-\subsection{Quantitative Analysis of Data}
+\subsection{Quantitative Analysis of Data Sets}
 \label{sec:quantitative}
+
+In Figure \ref{fig:data} we present some high-level statistics on the SD 2015 data set. The data are reproduced from \citeA{Oepen:15}. The PSD representation is the most fine-grained in terms of the linguistic variation of dependency labels. DM and PAS are in this respect more coarse-grained and similar. However, when examining the percentage of trees, projective vs. non-projective graphs, and reentrancies, wee see that PSD is the most `tree-oriented' of the three target representations. 
+
+As we mentioned in our Section \ref{sec:frames}, the number of frames in PSD is approximately 18 times that of the DM data set. 
 
 \section{Parsers}
 \label{sec:parsers}
