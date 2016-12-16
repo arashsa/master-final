@@ -1,34 +1,36 @@
 \chapter{Semantic Dependency Parsing with Frames}
 \label{chap:semantic}
 
-This chapter presents the state-of-the-art in semantic dependency parsing. More specifically, we will focus on what \citeA{Oepen:15} define as \textit{Broad Coverage Semantic Dependency Parsing}, that they define as
+This chapter presents the state-of-the-art in semantic dependency parsing. More specifically, we will focus on what \citeA{Oepen:15} define as \textit{Broad Coverage Semantic Dependency Parsing}:
 
 \begin{displayquote}
-... [T]he problem of recovering sentence-internal pre
+... [T]he problem of recovering sentence-internal predicate-argument relationships for \textit{all} \textit{content} \textit{words}, i.e. the semantic structure constituting the relational core of sentence meaning.
 \end{displayquote}
 
-As we touched upon in Chapter \ref{chap:background}, the target representations used in the research on syntactic dependency parsing, and the results that such parsers are able to produce, have been largely limited to tree data structures. A tree can be defined as an acyclic directed graph, i.e. every node is reachable from a root node by exactly one directed path. This structure impose certain restrictions, such as a unique root, connectedness, and lack of reentries (single-head constraint). 
+The emphasis on predicate-argument dependencies for all content words is the reason for focusing on dependency parsing techniques that can output a graph structure instead of a tree. In Chapter \ref{chap:background} we ended with a note on this aspect of dependency parsing, and in this chapter we will clarify and expand further upon where we left off.
 
-The restrictions that trees impose limit certain aspects of semantic analysis, such lexical units with multiple heads, or when it would be advantageous to leave certain semantically void lexemes outside of the dependency structure. In order to mitigate the restrictions imposed by tree-based parsing, efforts have been made to develop graph-structured representations. Parsing techniques have been developed that can be trained on target representations where the annotations are graphs instead of trees. These parsing techniques are thus capable of producing dependency structures that are better apt at capturing sentence semantics than tree-based parsers.
+The target representations used in the research on syntactic dependency parsing, and the results that such parsers are able to produce, have been largely limited to tree data structures. A tree can be defined as an acyclic directed graph, i.e. every node is reachable from a root node by exactly one directed path. This structure impose certain restrictions, such as a unique root, connectedness, and lack of reentries (single-head constraint). 
 
-In this chapter we will focus our attention on the 2014 and 2015 shared tasks on Broad-Coverage Semantic Dependency Parsing (SDP) \cite{Oepen:14, Oepen:15}. The two shared tasks have provided a large annotated corpora in 4 different annotation schemes available for training and testing. These are annotations on the Wall Street Journal (WSJ) corpus of the Penn Treebank (PTB) \cite{Mar:San:Mar:93} for the SDP 2014, and the added Brown corpus of the same Treebank for the SDP 2015.
+The restrictions that trees impose limit certain aspects of semantic analysis, such as lexical units with multiple heads, or when it would be advantageous to leave certain semantically void lexemes outside of the dependency structure. In reference to the quotation above, this would be words that are not considered content words. In order to mitigate the restrictions imposed by tree-based parsing, efforts have been made to develop graph-structured target representations. Parsing techniques have been developed that can be trained on representations where the annotations of a sentence establish a graph. These parsing techniques are thus capable of producing dependency structure that are better apt at capturing sentence semantics than tree-based parsing.
 
-Several researchers submitted their results to the two shared tasks, with many achieving state-of-the-art results in their submissions. We will first examine the target representations made available for the SDP 2014 and 2015 shared tasks, and then move on to a presentation of the technical aspects of the submission and results of the participating teams.
+In this chapter we will focus on the 2014 and 2015 shared tasks on Broad-Coverage Semantic Dependency Parsing (SDP) \cite{Oepen:14, Oepen:15}. The two shared tasks have provided a large annotated corpora in 4 different annotation schemes for training and testing. These are annotations on the Wall Street Journal (WSJ) corpus of the Penn Treebank (PTB) for the SDP 2014, and the added Brown corpus of the same Treebank for the SDP 2015 \cite{Mar:San:Mar:93}.
 
-The SDP tasks of 2015 also include annotated corpora for the Czech and Chinese language. We have decided to limit our research and analysis to the English language, and will therefore not include these results in our thesis. However, it is worth mentioning that these target representations exists, and that several sumbmissions to the SDP tasks also submitted results from parsers trained on the target representations in these two languages.
+Several researchers submitted their results to the two shared tasks, with many achieving state-of-the-art results in their submissions. We will first examine the target representations made available for the SDP 2014 and 2015 shared tasks, and then move on to a presentation of the submissions and results of the participating teams.
+
+The SDP task of 2015 also include annotated corpora for the Czech and Chinese languages. We have decided to limit our research and analysis to the English language, and will therefore not include these results in our thesis. However, it is worth mentioning that these target representations exists, and that several submissions to the SDP tasks also submitted results from parsers trained on the target representations in these two languages.
 
 \section{Target Representations}
 \label{sec:representations}
 
-Target representations are an integral part of data-driven parsing. They are the foundation on which data-driven parsers are trained in order to predict the most plausible dependency structure for a given sentence. The four distinct representations we will examine use different annotation schemes. The first three representations we will examine are called DM, PAS and PCEDT, which where used for the SDP 2014 shared tasks. For the SDP 2015 task, the PCEDT target representation was replaced by PSD, and so-called \textit{Frames} where added to the DM and PSD representations. We give provide a presentation of frames in Section \ref{sec:frames}. In Tables \ref{DM}, \ref{PAS}, \ref{PCEDT} and \ref{PSD} we have visually represented the annotations of DM, PAS, PCEDT and PSD on the sentence:
+Target representations are an integral part of data-driven parsing. They are the foundation on which data-driven parsers are trained in order to predict the most plausible dependency structure for a given sentence. The four distinct representations we will examine use different annotation schemes. The first three representations we will examine are called DM, PAS and PCEDT, which were used for the SDP 2014 shared tasks. For the SDP 2015 task, the PCEDT target representation was replaced by PSD, and so-called \textit{Frames} where added to the DM and PSD representations. In Tables \ref{DM}, \ref{PAS}, \ref{PCEDT} and \ref{PSD} we have visually represented the annotations of DM, PAS, PCEDT and PSD on the sentence:
 
 \begin{displayquote}
 Bramalea said it expects to complete the issue by the end of the month.
 \end{displayquote}
 
-This sentence has been chosen in order to highlight certain aspects of a semantic dependency graph: lexical units that are left unattached, a few examples where a lexical unit have more than one head (breaking the so-called single-head constraint that a tree would impose), and edges that make the graph non-projective. 
+This sentence has been chosen in order to highlight certain aspects of a semantic dependency graph: some lexical units are left unattached, we have a few examples of lexical units with more than one head (breaking the so-called single-head constraint that a tree would impose), and edges that make the graph non-projective. It is worth noting that a tree can be non-projective, and that this is not a special case for graph representations, but is often necessary in order to fully represent longer predicate-argument dependencies where crossing edges are more likely.
 
-The data-sets that we will examine are all represented in the SDP format. Various approaches have been used to reach the target representations used in these data-sets, and we will now examine the way these have been constructed, and present information on their content\footnote{See \url{http://sdp.delph-in.net/2014/data.html} and \url{http://sdp.delph-in.net/2015/data.html} for the technical details on the data format of SDP 2014 and 2015 respectively.}.
+The data-sets that we will examine are all represented in the SDP format\footnote{See \url{http://sdp.delph-in.net/2014/data.html} and \url{http://sdp.delph-in.net/2015/data.html} for the technical details on the data format of SDP 2014 and 2015 respectively.}. We will now examine the how the target representations have been constructed, and present data on their content.
 
 
 \begin{figure}
@@ -135,43 +137,79 @@ The data-sets that we will examine are all represented in the SDP format. Variou
 
 \end{displayquote}
 
-\paragraph{PCEDT: Prague Tectogrammatical Bi-Lexical Dependencies} The Prague Czech-English Dependency Treebank \cite{PCEDT}\footnote{See \url{http://ufal.mff.cuni.cz/pcedt2.0/}} is a dependency treebank over the WSJ from the PTB. The original English texts have been annotated along with annotated Czech translations. Similar to other treebanks from the PTB, the texts have been annotated with two layers of syntactic information: \textit{analytical} (a-layer) and \textit{tectogrammatical} (t-layer) \cite{Oepen:14}. The a-layer represents the so-called surface syntax, where the labels in the dependencies represent the syntactic information of the sentence. The t-layer is a layer where syntax and semantic dependencies are represented, and is based on the framework of the Functional Generative Description \cite{Sgall:86}. A conversion has been used in order to reach the SDP data format from this t-layer; see \citeA{Miyao:14} for details on the conversion from the t-layer of the PCEDT representation to the SDP representation.
+\paragraph{PCEDT: Prague Tectogrammatical Bi-Lexical Dependencies} The Prague Czech-English Dependency Treebank \cite{PCEDT}\footnote{See \url{http://ufal.mff.cuni.cz/pcedt2.0/}} is a dependency treebank over the WSJ from the PTB. The original English texts have been annotated along with annotated Czech translations. Similar to other treebanks from the PTB, these texts have been annotated with two layers of syntactic information: \textit{analytical} (a-layer) and \textit{tectogrammatical} (t-layer) \cite{Oepen:14}. The a-layer represents the so-called surface syntax, where the labels in the dependencies represent the syntactic information of the sentence. The t-layer is a layer where syntax and semantic dependencies are represented, and is based on the framework of the Functional Generative Description \cite{Sgall:86}. A conversion has been used in order to reach the SDP data format from this t-layer; see \citeA{Miyao:14} for details on the conversion from the t-layer of the PCEDT representation to the SDP representation.
 
-\paragraph{PAS: Enju Predicate–Argument Structures} The Enju representations is based on Head-driven phrase structure grammar (HPSG), and are derived from the Enju HPSG treebank, which are conversions from the phrase structure and predicate-argument representation of the PTB \cite{Oepen:14}. The PAS representation is extracted from the predicate-argument structures of the HPSDG Treebank. This predicate-argument structure represent bi-lexical semantic dependencies. As the PCEDT format, again see \citeA{Miyao:14} for the technical details on the conversion to the SDP data format.
+\paragraph{PAS: Enju Predicate–Argument Structures} The Enju representation is based on Head-driven phrase structure grammar (HPSG), and is derived from the Enju HPSG treebank. This treebank is made by way of conversions from the phrase structure and predicate-argument representation of the PTB \cite{Oepen:14}. The PAS representation is extracted from the predicate-argument structures of the HPSDG Treebank. This predicate-argument structure represent bi-lexical semantic dependencies. As the PCEDT format, we refer the reader to \citeA{Miyao:14} for the technical details on the conversion to the SDP data format.
 
-\paragraph{DM: DELPH-IN MRS-Derived Bi-Lexical Dependencies} The semantic dependency graphs of the DM format are derived from the output of ERG parser. This parser adds syntactic and semantic analysis by using the LinGO English Resource Grammar (LERG), which in a similar fashion to PAS is based on HPSG. It adds to the standard framework of HPSG by using Minimal Recursion Semantics for specifying semantic attributes, and it does not implement the binding theory of HPSG \cite{Flickinger:00}. The DM representations are derived through a two-step `lossy' conversion. The first step in this conversion is to convert the MRSs to variable-free \textit{Elementary Dependency Structures}, and then a second step is applied where some information is lost in transforming the results of the previous step to the strictly bi-lexical SDP data format \cite{Miyao:14}.
+\paragraph{DM: DELPH-IN MRS-Derived Bi-Lexical Dependencies} The semantic dependency graphs of the DM format are derived from the output of the ERG parser. This parser adds syntactic and semantic analysis by using the LinGO English Resource Grammar (LERG). LERG is, in a similar fashion to PAS, based on HPSG. It adds to the standard framework of HPSG by using Minimal Recursion Semantics for specifying semantic attributes, but does so without implementing the binding theory of HPSG \cite{Flickinger:00}. The DM representations are derived through a two-step `lossy' conversion. The first step in this conversion is to convert the MRSs to variable-free \textit{Elementary Dependency Structures}, and then a second step is applied where some information is lost in transforming the results of the previous step to the strictly bi-lexical SDP data format \cite{Miyao:14}.
 
-\paragraph{PSD: Prague Semantic Dependencies} The PCEDT target representation is used as basis for arriving at the PSD\footnote{See \url{http://tinyurl.com/h8dfkcz} for more technical details on the PSD target representation and conversion from PCEDT.} representation by way of a conversion. The PCEDT representation consists of dependency structures that are always rooted trees, due to the technical aspects of the conversion from the t-layers to the SDP data format. For the SDP 2015 task, a conversion of the PCEDT data's t-layer was performed in order to reach true bi-lexical dependencies.\\
+\paragraph{PSD: Prague Semantic Dependencies} The PCEDT target representation is used as basis for arriving at the PSD\footnote{See \url{http://tinyurl.com/h8dfkcz} for more technical details on the PSD target representation and conversion from PCEDT.} target representation. This is made using a conversion. The PCEDT representation consists of dependency structures that are always rooted trees. This is due to technical aspects of the conversion from the t-layers mentioned above, to the PCEDT data format. For the SDP 2015 task, a conversion of the PCEDT data's t-layer was performed in order to reach true bi-lexical dependencies.
 
 \subsection{Frames}
 \label{sec:frames}
 
+The SDP 2015 introduced frames, also referred to as sense distinctions, to the DM and PSD target representations. The notion of frames is similar to Semantic Role Labeling (SRL), which was pionered by \citeA{}
+
+The number of frames in DM are far lower than PSD, as you can see in Figure \ref{fig:data}. The DM frames are limited to argument structure distinctions, while PSD has a much larger scope in the sense distinctions that are captured. According to \citeA{Oepen:15}, DM is limited to causative vs. inchoative aspects in regards to the arity or coarse semantic typing of argument frames.
+
+\section{Data sets}
+\label{sec:data-sets}
+
+The data-sets for the SDP 2014 and 2015 vary slightly. In the SDP 2014, the three annotations are over the same set of texts: Sections 00-21 of the WSJ corpus. A set of sentences where excluded from the data sets where (a) no gold-standard analysis existed; (b) it was not possible to align the tokens of the on-to-one; (c) there where cycles in at least on of the graphs of a sentence. In addition to a some lack of analysis already present in the data sets, the SDP 2014 data set counts roughly 34,004 sentences (or a total of 745,543 tokens) for the training split (Sections 00-20), and 1,348 sentences (or a total of 29,808 tokens) for the test split (Section 21) \cite{Oepen:14}. The SDP 2015 shared tasks used the same data set, but added a balanced corpus from the Brown Corpus. Also, the DM graphs where extracted from a later and improved release of the DeepBank (version 1.1). The exclusion of sentences from the data sets where a bit lower for SDP 2015, and the training set counts 35,657 sentences (or a total of 802,717 tokens; roughly eight percent more than for SDP 2014). For the test set 1,410 sentences (or a total of 31,948 tokens) from the WSJ Section 21 was reserved for in-domain testing, and 1,849 sentences (or a total of 31,583 tokens) was reserved for out-of-domain testing from the Brown Corpus \cite{Oepen:15}.
+
+In Figure \ref{fig:data} we present some high-level statistics on the SD 2015 data set that have been reproduced from \citeA{Oepen:15}. We exclude the 2014 SDP data set, as we are only interested in the results from the 2015 SDP tasks. In Chapter \ref{chap:analysis} we follow the same suit and focus solely on the SDP 2015 results in our contrastive analysis of the contributions and results.
+
+\begin{table}
+    \centering
+    \smaller[0.5]
+    \begin{tabular}{@{}lcccccc@{}}
+        \toprule
+        & \multicolumn{3}{c}{In-domain}
+        & \multicolumn{3}{c}{Out-of-domain} \\
+        \cmidrule(lr){2-4}
+        \cmidrule(lr){5-7}
+        \textbf{} & \textbf{DM} & \textbf{PAS} & \textbf{PSD} &
+        \textbf{DM} & \textbf{PSD} & \textbf{PSD} \\
+        \midrule
+        \# labels & 59 & 42 & 91 & 47 & 41 & 74 \\
+        \% singletons & 22.97 & 4.38 & 35.76 & 25.40 & 5.84 & 39.11 \\
+        edge density & 0.96 & 1.02 & 1.01 &  0.95 & 1.02 & 0.99 \\
+        $\%_g$ trees & 2.30 & 1.22 & 42.19 & 9.68 & 2.38 & 51.43 \\
+        $\%_g$ noncrossing & 69.03 & 59.57 & 64.58 & 74.58 & 65.28 & 74.26 \\
+        $\%_g$ projective & 2.91 & 1.64 & 41.92 & 8.82 & 3.46 & 54.35 \\
+        $\%_g$ fragmented & 6.55 & 0.23 & 0.69 & 4.71 & 0.65 & 1.73 \\
+        $\%_n$ reentrancies & 27.44 & 29.36 & 11.42 & 26.14 & 29.36 & 11.46 \\
+        $\%_g$ topless & 0.31 & 0.02 & – & 1.41 & – & – \\
+        \# top nodes & 0.9969 & 0.9998 & 1.1276 & 0.9859 & 1.0000 & 1.2645 \\
+        $\%_n$ non-top roots & 44.91 & 55.98 & 4.35 & 39.89 & 50.93 & 5.27 \\
+        average treewidth & 1.30 & 1.72 & 1.61 & 1.31 & 1.69 & 1.50  \\
+        maximum treewidth & 3 & 3 & 7  & 3 & 3 & 5 \\
+        \midrule
+        \# frames & 297 & – & 5426  & 172 & – & 1208 \\
+        $\%_n$ frames & 13.52 & – & 16.77 & 15.79 & – & 19.50 \\
+        \bottomrule
+    \end{tabular}
+    \caption{High-level statistics on the SDP 2015 data sets}
+    \label{fig:data}
+\end{table}
+
+% \begin{table}
+%     \centering  
+%     \smaller[0.5]
+%     \begin{tabular}{@{}lrrr@{}}
+%         \toprule
+%         & \textbf{DM} &  \textbf{PAS} & \textbf{PSD} & \\
+%         \midrule
+%         \texttt{adj} & 3144 & 95.89\% & 94.97\% \\
+%         \bottomrule
+%     \end{tabular}
+%     \caption{Statistics of target representations for SDP 2015.}
+%     \label{fig:data-in-domain}
+% \end{table}
+
+\subsection{Quantitative Analysis of Data}
+\label{sec:quantitative}
 
 \section{Parsers}
 \label{sec:parsers}
 
-% \begin{table}
-%     \centering
-%     \smaller[0.5]
-%     \begin{tabular}{@{}lrrrr@{}}
-%         \toprule
-%         \textbf{Tag} &  \textbf{Freq} & \textbf{Precision} & \textbf{Recall} &
-%         \textbf{F-score} \\
-%         \midrule
-%         \texttt{adj} & 3144 & 95.89\% & 94.97\% & 95.43\% \\
-%         \texttt{adv} & 1337 & 96.00\% & 96.93\% & 96.46\% \\
-%         \texttt{det} & 2408 & 96.06\% & 95.14\% & 95.60\% \\
-%         \texttt{inf-merke} & 531 & 99.62\% & 99.81\% & 99.72\% \\
-%         \texttt{interj} & 35 & 92.00\% & 65.71\% & 76.67\% \\
-%         \texttt{konj} & 1307 & 99.62\% & 99.16\% & 99.39\% \\
-%         \texttt{prep} & 4878 & 98.37\% & 97.62\% & 97.99\% \\
-%         \texttt{pron} & 2369 & 96.08\% & 97.34\% & 96.71\% \\
-%         \texttt{sbu} & 1074 & 90.49\% & 93.95\% & 92.19\% \\
-%         \texttt{subst} & 8944 & 97.69\% & 98.29\% & 97.99\% \\
-%         \texttt{ukjent} & 51 & 67.80\% & 78.43\% & 72.73\% \\
-%         \texttt{verb} & 5932 & 97.79\% & 97.08\% & 97.44\% \\
-%         \bottomrule
-%     \end{tabular}
-%     \caption{Tagger performance with the original tag set.}
-%     \label{baselinetagerror}
-% \end{table}
