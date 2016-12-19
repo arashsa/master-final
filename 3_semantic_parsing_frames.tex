@@ -1,7 +1,7 @@
 \chapter{Semantic Dependency Parsing with Frames}
 \label{chap:semantic}
 
-This chapter presents the state-of-the-art in semantic dependency parsing. The goal of semantic dependency parsing can be superficially defined as a representation of `Who did what to whom', and adding `when' and `where' to the equation. This is similar to Semantic Role Labeling (SRL), where the goal is to represent the abstract role that arguments of a predicate can take in the event \cite{Jur:Mar:09}. However, semantic dependency parsing usually has a broader scope in its representation, attempting to add various semantic phenomena, such ass negation, and other scopal dependencies that are not part of the scope of SRL.
+This chapter presents the state-of-the-art in semantic dependency parsing. The goal of semantic dependency parsing can be superficially defined as a representation of `Who did what to whom', possibly adding `when' and `where' to the equation. This is similar to the aims of Semantic Role Labeling (SRL), which according to \cite{Jur:Mar:09} is a shallow semantic representation of \textit{semantic roles}, which are defined as the abstract role that the argument of a predicate can take in an event. However, semantic dependency parsing usually has a broader scope in its representation, attempting to identify various semantic phenomena, such ass negation, and other scopal dependencies that are not part of the scope of SRL.
 
 To be more specific on the goals of this chapter, we will examine what \citeA{Oepen:15} define as \textit{Broad Coverage Semantic Dependency Parsing}:
 
@@ -11,15 +11,15 @@ To be more specific on the goals of this chapter, we will examine what \citeA{Oe
 
 The emphasis on predicate-argument dependencies for all content words is the reason for focusing on dependency parsing techniques that can output a graph structure instead of a tree. In Chapter \ref{chap:background} we ended with a note on this aspect of dependency parsing, and in this chapter we will clarify and expand further upon where we left off.
 
-The target representations used in the research on syntactic dependency parsing, and the results that such parsers are able to produce, have been largely limited to tree data structures. A tree can be defined as an acyclic directed graph, i.e. every node is reachable from a root node by exactly one directed path. This structure impose certain restrictions, such as a unique root, connectedness, and lack of reentries (single-head constraint). 
+The target representations used in the research on syntactic dependency parsing, and the results that such parsers are able to produce, have been largely limited to tree data structures. A tree can be defined as an acyclic directed graph, i.e. every node is reachable from a root node by exactly one directed path. This structure impose certain restrictions, such as a unique root, connectedness, and lack of reentries (single-head constraint), on the type of dependencies that can be represented.
 
-The restrictions that trees impose limit certain aspects of semantic analysis, such as lexical units with multiple heads, or when it would be advantageous to leave certain semantically void lexemes outside of the dependency structure. In reference to the quotation above, this would be words that are not considered content words. In order to mitigate the restrictions imposed by tree-based parsing, efforts have been made to develop graph-structured target representations. Parsing techniques have been developed that can be trained on representations where the annotations of a sentence establish a graph. These parsing techniques are thus capable of producing dependency structure that are better apt at capturing sentence semantics than tree-based parsing.
+The restrictions that trees impose thus limit certain aspects of semantic analysis, such as lexical units with multiple heads, or when it would be advantageous to leave certain semantically void lexemes outside of the dependency structure. In order to mitigate the restrictions imposed by tree-based parsing, efforts have been made to develop graph-structured target representations. Data-driven parsing techniques have been developed that can be trained on representations where the annotations of a sentence establish a dependency graph. These parsing techniques are capable of producing dependency structure that are better apt at capturing sentence semantics than tree-based parsing.
 
 In this chapter we will focus on the 2014 and 2015 shared tasks on Broad-Coverage Semantic Dependency Parsing (SDP) \cite{Oepen:14, Oepen:15}. The two shared tasks have provided a large annotated corpora in 4 different annotation schemes for training and testing. These are annotations on the Wall Street Journal (WSJ) corpus of the Penn Treebank (PTB) for the SDP 2014, and the added Brown corpus of the same Treebank for the SDP 2015 \cite{Mar:San:Mar:93}.
 
-Several researchers submitted their results to the two shared tasks, with many achieving state-of-the-art results in their submissions. We will first examine the target representations made available for the SDP 2014 and 2015 shared tasks, and then move on to a presentation of the submissions and results of the participating teams.
+Several researchers submitted their results to the two shared tasks, with many achieving state-of-the-art accuracy in their submissions. We will first examine the target representations made available for the SDP 2014 and 2015 shared tasks, and then move on to a presentation of the submissions and results of the participating teams.
 
-The SDP task of 2015 also include annotated corpora for the Czech and Chinese languages. We have decided to limit our research and analysis to the English language, and will therefore not include these results in our thesis. However, it is worth mentioning that these target representations exists, and that several submissions to the SDP tasks also submitted results from parsers trained on the target representations in these two languages.
+The SDP task of 2015 also include annotated corpora for Czech and Chinese (Mandarin) languages. We have decided to limit our research and analysis to the English language, and will therefore not include these results in our thesis. However, it is worth mentioning that these target representations exist, and that several submissions to the SDP tasks also submitted results from parsers trained on the target representations in these two languages.
 
 \section{Target Representations}
 \label{sec:representations}
@@ -30,9 +30,9 @@ Target representations are an integral part of data-driven parsing. They are the
 Bramalea said it expects to complete the issue by the end of the month.
 \end{displayquote}
 
-This sentence has been chosen in order to highlight certain aspects of a semantic dependency graph: some lexical units are left unattached, we have a few examples of lexical units with more than one head (breaking the so-called single-head constraint that a tree would impose), and edges that make the graph non-projective. It is worth noting that a tree can be non-projective, and that this is not a special case for graph representations, but is often necessary in order to fully represent longer predicate-argument dependencies where crossing edges are more likely.
+This sentence has been chosen in order to highlight certain aspects of a semantic dependency graph: some lexical units are left unattached, we have a few examples of lexical units with more than one head (breaking the so-called single-head constraint that a tree would impose), and dependencies that cross, making the graphs non-projective. It is worth noting that a tree can be non-projective, and that this is not a special case for graph representations, but is often desired in order to fully represent longer predicate-argument dependencies that create crossing dependencies across a sentence.
 
-The data-sets that we will examine are all represented in the SDP format\footnote{See \url{http://sdp.delph-in.net/2014/data.html} and \url{http://sdp.delph-in.net/2015/data.html} for the technical details on the data format of SDP 2014 and 2015 respectively.}. We will now examine the how the target representations have been constructed, and present data on their content.
+The data-sets that we will examine are all represented in the SDP format\footnote{See \url{http://sdp.delph-in.net/2014/data.html} and \url{http://sdp.delph-in.net/2015/data.html} for the technical details on the data format of SDP 2014 and 2015 respectively.}. We will now examine how these target representations have been constructed, and present some higher-level statistics on their content.
 
 
 \begin{figure}
@@ -150,7 +150,7 @@ The data-sets that we will examine are all represented in the SDP format\footnot
 \subsection{Frames}
 \label{sec:frames}
 
-The SDP 2015 introduced frames, also referred to as sense distinctions, to the DM and PSD target representations. These are added as an extra layer to the sentence where multiple classes are used in order to add specific information on the content words of a sentence. If we examine the semantic dependency graphs in Figure \ref{DM} and \ref{PSD}, we see these classes below the sentence. The number of frames in DM are far lower than PSD, as we can observe in Figure \ref{fig:data}.
+The SDP 2015 introduced frames, also referred to as sense distinctions, to the DM and PSD target representations. These are added as an extra layer to the sentence where multiple classes are used in order to add additional information on the content words of a sentence. If we examine the semantic dependency graphs in Figure \ref{DM} and \ref{PSD}, we see these classes below the sentence.
 
 According to \citeA{Oepen:16}, DM frames encode more general `linking patterns', which are mappings from syntactic to semantic arguments, whereas PSD represents actual sense identifiers and show different values for distinct lexemes. They note further that PSD only annotates senses on verbal predicates, while DM provide frame identifiers for all semantically contentful nodes. Additionally, \citeA{Oepen:15} note that the DM frames are limited to argument structure distinctions, e.g. causative vs. inchoative contrasts or differences in the arity or coarse semantic typing of argument frames. They further note that the PSD frames draw on much richer sense inventory, based on the EngValLex database \cite{Cinkova:06}.
 
@@ -214,10 +214,98 @@ We exclude the 2014 SDP data set when we further explore the data sets. We will 
 \subsection{Quantitative Analysis of Data Sets}
 \label{sec:quantitative}
 
-In Figure \ref{fig:data} we present some high-level statistics on the SD 2015 data set. The data are reproduced from \citeA{Oepen:15}. The PSD representation is the most fine-grained in terms of the linguistic variation of dependency labels. DM and PAS are in this respect more coarse-grained and similar. However, when examining the percentage of trees, projective vs. non-projective graphs, and reentrancies, wee see that PSD is the most `tree-oriented' of the three target representations. 
+In Figure \ref{fig:data} we present some high-level statistics on the SD 2015 data set. The data are reproduced from \citeA{Oepen:15}. The PSD representation is the most fine-grained in terms of the linguistic variation of dependency labels with 91 unique labels. DM and PAS are in this respect more coarse-grained and similar, also sharing a more similar naming and type convention.
 
-As we mentioned in our Section \ref{sec:frames}, the number of frames in PSD is approximately 18 times that of the DM data set. 
+When examining the percentage of trees, projective vs. non-projective graphs, and reentrancies, wee see that PSD is the most `tree-oriented' of the three target representations. As mentioned above, the PSD target representation is based on the PCEDT representation, which only consists of dependency structures that are rooted trees. 
 
-\section{Parsers}
+As we can observe in Figure \ref{fig:data}, the number of frames in PSD is approximately 18 times that of the DM data set. 
+
+\section{Parsers and their Results}
 \label{sec:parsers}
 
+In this Section we will examine a set of state-of-the art semantic dependency parsers. As mentioned previously, we will examine the submissions from the SDP 2015, and not include the results from SDP 2014. This choice is based on the observation that many of the same teams submitted for both tasks, that the SDP 2015 shared tasks are an extension of the previous year, and that the scores for the submissions only saw an improvement the second year.
+
+We can observe the performance of the SDP 2015 parsers in Table \ref{fig:results}, which have been reproduced from \citeA{Oepen:15}. There where 6 teams that submitted results from their parsing systems. Each team could submit two runs per track, and it is the best run (if more than one run were submitted) that is presented in Table \ref{fig:results}. The evaluation of each parser is based on the accuracy of the dependency graphs that they produce on the test set mentioned above, measured against the gold-standard testing data. The evaluation itself is based on the metrics: 
+
+\begin{enumerate}
+    \item Labeled precision, recall, and F$_1$, referred to as LP, LR and LF.
+    \item Complete predications: Which for the DM and PAS target representation means measuring all outgoing dependency edges, and for the PSD target representation to the ones where the label has an `-arg' suffix. Here too precision, recall and F$_1$ score is used, referred to as PP, PR, and PF.
+    \item Semantic frames: This is comprised of a complete predication with scores for the frame (or sense) identifier. As other scores, this score is also represented by precision, recall and F$_1$ score, referred to as FP, FR, and FF.
+    \item Both complete predications and semantic frames evaluations are limited to those predicates that correspond to verbal parts of speech, as determined by the gold-standard part of speech.
+\end{enumerate}
+
+We will now examine each teams submissions in their own right.
+
+\paragraph{Turku} 
+
+\paragraph{Lisbon}
+
+\paragraph{Peking}
+
+\paragraph{Riga}
+
+\paragraph{Minsk}
+
+\paragraph{In-House}
+
+
+\begin{table}
+    \centering
+    \smaller[]
+    \smaller[]
+    \smaller[0.5]
+    \begin{tabular}{@{}cccccccccccccc@{}}
+        \toprule
+        \multicolumn{1}{c}{ }
+        & \multicolumn{1}{c}{ }
+        & \multicolumn{4}{c}{\textbf{DM}}
+        & \multicolumn{4}{c}{\textbf{PAS}}
+        & \multicolumn{4}{c}{\textbf{PSD}} \\
+        \cmidrule(lr){3-6}
+        \cmidrule(lr){7-10}
+        \cmidrule(lr){11-14}
+        &
+        LF.av &
+        LF & LP & LR & FF &
+        LP & LR & LF & PF &
+        LF & LP & LR & FF \\
+        \midrule
+        Turku\# & 86.81 & 88.29 & 89.52 & 87.09 & 58.39 & 95.58 & 95.94 & 95.21 & 87.99 & 76.57 & 78.24 & 74.97 & 56.85 \\
+        Lisbon* & 86.23 & 89.44 & 90.52 & 88.39 & 00.20 & 91.67 & 92.45 & 90.90 & 84.18 & 77.58 & 79.88 & 75.41 & 00.06 \\
+        Peking & 85.33 & 89.09 & 90.93 & 87.32 & 63.08 & 91.26 & 92.90 & 89.67 & 79.08 & 75.66 & 78.60 & 72.93 & 49.95 \\
+        Lisbon & 85.15 & 88.21 & 89.84 & 86.64 & 00.15 & 90.88 & 91.87 & 89.92 & 81.74 & 76.36 & 78.62 & 74.23 & 00.03 \\
+        Riga & 84.00 & 87.90 & 88.57 & 87.24 & 58.12 & 90.75 & 91.50 & 90.02 & 80.03 & 73.34 & 75.25 & 71.52 & 52.54 \\
+        Turku* & 83.47 & 86.17 & 87.80 & 84.60 & 54.67 & 90.62 & 91.38 & 89.87 & 80.60 & 73.63 & 76.10 & 71.32 & 53.20 \\
+        Minsk & 80.74 & 84.13 & 86.28 & 82.09 & 54.24 & 85.24 & 87.28 & 83.28 & 64.66 & 72.84 & 74.65 & 71.13 & 51.63 \\
+        In-House* & 61.61 & 92.80 & 92.85 & 92.75 & 83.79 & 92.03 & 92.07 & 91.99 & 87.24 & – & – & – & – \\
+        \bottomrule
+        
+        \\
+        \toprule
+        \multicolumn{1}{c}{ }
+        & \multicolumn{1}{c}{ }
+        & \multicolumn{4}{c}{\textbf{DM}}
+        & \multicolumn{4}{c}{\textbf{PAS}}
+        & \multicolumn{4}{c}{\textbf{PSD}} \\
+        \cmidrule(lr){3-6}
+        \cmidrule(lr){7-10}
+        \cmidrule(lr){11-14}
+        &
+        LF.av &
+        LF & LP & LR & FF &
+        LP & LR & LF & PF &
+        LF & LP & LR & FF \\
+        \midrule
+        Turku\# & 83.50 & 82.11 & 84.26 & 80.07 & 42.89 & 92.92 & 93.52 & 92.33 & 83.80 & 75.47 & 77.77 & 73.31 & 42.37 \\
+        Lisbon* & 82.53 & 83.77 & 85.79 & 81.84 & 00.35 & 87.63 & 88.88 & 86.41 & 80.19 & 76.18 & 80.12 & 72.61 & 02.25 \\
+        Lisbon & 81.15 & 81.75 & 84.81 & 78.90 & 00.27 & 86.88 & 88.52 & 85.30 & 78.47 & 74.82 & 78.68 & 71.31 & 02.09 \\
+        Peking & 80.78 & 81.84 & 84.29 & 79.53 & 47.49 & 87.23 & 89.47 & 85.10 & 74.75 & 73.28 & 77.36 & 69.61 & 34.28 \\
+        Riga & 79.23 & 80.69 & 81.69 & 79.72 & 41.88 & 86.63 & 87.56 & 85.72 & 76.26 & 70.37 & 73.23 & 67.71 & 40.76 \\
+        Turku* & 78.85 & 79.01 & 81.54 & 76.63 & 39.15 & 85.95 & 86.95 & 84.98 & 76.38 & 71.59 & 74.92 & 68.55 & 38.75 \\
+        Minsk & 75.79 & 77.24 & 80.24 & 74.46 & 42.18 & 80.44 & 83.07 & 77.96 & 62.00 & 69.68 & 72.26 & 67.27 & 41.25 \\
+        In-House* & 59.24 & 89.69 & 89.80 & 89.58 & 76.39 & 88.03 & 88.10 & 87.96 & 81.69 & – & – & – & – \\
+        \bottomrule
+    \end{tabular}
+    \caption{Results from the gold track (marked \#), open track (marked *) and closed track (unmarked) of the in-domain (top) and out-of-domain (bottom). LF.av indicates the average LF score across all representations, and is used to rank the systems in their overall performance.}
+    \label{fig:results}
+\end{table}
