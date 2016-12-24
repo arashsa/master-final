@@ -1,7 +1,7 @@
 \chapter{Semantic Dependency Parsing with Frames}
 \label{chap:semantic}
 
-This chapter presents the state-of-the-art in semantic dependency parsing. The goal of semantic dependency parsing can be superficially defined as a representation of `Who did what to whom', possibly adding `when' and `where' to the equation. This is similar to the aims of Semantic Role Labeling (SRL), which according to \cite{Jur:Mar:09} is a shallow semantic representation of \textit{semantic roles}, which are defined as the abstract role that the argument of a predicate can take in an event. However, semantic dependency parsing usually has a broader scope in its representation, attempting to identify various semantic phenomena, such ass negation, and other scopal dependencies that are not part of the scope of SRL.
+This chapter presents the state-of-the-art in semantic dependency parsing. The goal of semantic dependency parsing can be superficially defined as a representation of `Who did what to whom', possibly adding `when' and `where' to the equation. This is similar to the aims of Semantic Role Labeling (SRL), which according to \cite{Jur:Mar:09} is a shallow semantic representation of \textit{semantic roles}. They define semantic roles as the abstract role that the argument of a predicate can take in an event. Semantic dependency parsing usually has a broader scope in its representation. In addition to the goals of SRL, semantic dependency parsing attempts to identify various semantic phenomena, such as negation, and other scopal dependencies that are not part of the scope of SRL.
 
 To be more specific on the goals of this chapter, we will examine what \citeA{Oepen:15} define as \textit{Broad Coverage Semantic Dependency Parsing}:
 
@@ -13,11 +13,11 @@ The emphasis on predicate-argument dependencies for all content words is the rea
 
 The target representations used in the research on syntactic dependency parsing, and the results that such parsers are able to produce, have been largely limited to tree data structures. A tree can be defined as an acyclic directed graph, i.e. every node is reachable from a root node by exactly one directed path. This structure impose certain restrictions, such as a unique root, connectedness, and lack of reentries (single-head constraint), on the type of dependencies that can be represented.
 
-The restrictions that trees impose thus limit certain aspects of semantic analysis, such as lexical units with multiple heads, or when it would be advantageous to leave certain semantically void lexemes outside of the dependency structure. In order to mitigate the restrictions imposed by tree-based parsing, efforts have been made to develop graph-structured target representations. Data-driven parsing techniques have been developed that can be trained on representations where the annotations of a sentence establish a dependency graph. These parsing techniques are capable of producing dependency structure that are better apt at capturing sentence semantics than tree-based parsing.
+The restrictions that trees impose thus limit certain aspects of semantic analysis, such as dependents with more than one head, or when it would be advantageous to leave certain semantically void lexemes outside of the dependency structure. In order to mitigate the restrictions imposed by tree-based parsing, efforts have been made to develop graph-structured target representations. Data-driven parsing techniques have been developed that can be trained on representations where the annotations of a sentence establish a dependency graph. These parsing techniques are capable of producing dependency structures that are better apt at capturing sentence semantics than parsing techniques that output a tree structure.
 
-In this chapter we will focus on the 2014 and 2015 shared tasks on Broad-Coverage Semantic Dependency Parsing (SDP) \cite{Oepen:14, Oepen:15}. The two shared tasks have provided a large annotated corpora in 4 different annotation schemes for training and testing. These are annotations on the Wall Street Journal (WSJ) corpus of the Penn Treebank (PTB) for the SDP 2014, and the added Brown corpus of the same Treebank for the SDP 2015 \cite{Mar:San:Mar:93}.
+We will focus our attention on the 2014 and 2015 shared tasks on Broad-Coverage Semantic Dependency Parsing (SDP) \cite{Oepen:14, Oepen:15}. The two shared tasks have provided a large annotated corpora in 4 different annotation schemes for training and testing. These are annotations on the Wall Street Journal (WSJ) corpus of the Penn Treebank (PTB) for the SDP 2014, and the added Brown corpus of the same Treebank for the SDP 2015 shared task \cite{Mar:San:Mar:93}.
 
-Several researchers submitted their results to the two shared tasks, with many achieving state-of-the-art accuracy in their submissions. We will first examine the target representations made available for the SDP 2014 and 2015 shared tasks, and then move on to a presentation of the submissions and results of the participating teams.
+Several researchers submitted their results to the two shared tasks, with many achieving state-of-the-art accuracy in their submissions. We will first examine the target representations made available for the SDP 2014 and 2015 shared task, and then move on to a presentation of the techniques used by the submitting teams. We restrict this presentation to the SDP 2015 task, as we will do when we examine some higher level statistics on the data sets. Since the SDP 2015 task is an extension of the previous year, we find it more useful to focus our attention on the data sets and submissions of that year. The results also saw an increase in overall performance in the SDP 2015 shared task than the previous year. Chapter \ref{chap:analysis} we follow the same suit and focus solely on the SDP 2015 results in our contrastive analysis of the results of a set of chosen parsing systems.
 
 The SDP task of 2015 also include annotated corpora for Czech and Chinese (Mandarin) languages. We have decided to limit our research and analysis to the English language, and will therefore not include these results in our thesis. However, it is worth mentioning that these target representations exist, and that several submissions to the SDP tasks also submitted results from parsers trained on the target representations in these two languages.
 
@@ -161,8 +161,6 @@ As we will see in Chapter \ref{chap:analysis}, we will focus on frames when in o
 
 The data-sets for the SDP 2014 and 2015 vary slightly. In the SDP 2014, the three annotations are over the same set of texts: Sections 00-21 of the WSJ corpus. A set of sentences where excluded from the data sets where (a) no gold-standard analysis existed; (b) it was not possible to align the tokens of each sentence on-to-one for all three representations; (c) there where cycles in at least on of the graphs of a sentence. After this cleanup, the SDP 2014 data set counts 34,004 sentences (or a total of 745,543 tokens) for the training split (Sections 00-20), and 1,348 sentences (or a total of 29,808 tokens) for the test split (Section 21) \cite{Oepen:14}. The SDP 2015 shared tasks used the same data set, but added a balanced corpus from the Brown Corpus. Also, the DM graphs where extracted from a later and improved release of the DeepBank (version 1.1). The exclusion of sentences from the data sets where a bit lower for SDP 2015, and the training set counts 35,657 sentences (or a total of 802,717 tokens; roughly eight percent more than for SDP 2014). For the test set 1,410 sentences (or a total of 31,948 tokens) from the WSJ Section 21 was reserved for in-domain testing, and 1,849 sentences (or a total of 31,583 tokens) from the Brown Corpus was reserved for out-of-domain testing \cite{Oepen:15}.
 
-We exclude the 2014 SDP data set when we further explore the data sets. We will focus on the results from the 2015 SDP tasks due to the fact that this is an extension of the previous year, but also due to the increase in overall performance from the participating research teams. In Chapter \ref{chap:analysis} we follow the same suit and focus solely on the SDP 2015 results in our contrastive analysis of the best scoring submissions.
-
 \begin{table}
     \centering
     \smaller[0.5]
@@ -220,12 +218,16 @@ When examining the percentage of trees, projective vs. non-projective graphs, an
 
 As we can observe in Figure \ref{fig:data}, the number of frames in PSD is approximately 18 times that of the DM data set. 
 
-\section{Parsers and their Results}
+\section{Results from the Submissions}
 \label{sec:parsers}
 
-In this Section we will examine a set of state-of-the art semantic dependency parsers. As mentioned previously, we will examine the submissions from the SDP 2015, and not include the results from SDP 2014. This choice is based on the observation that many of the same teams submitted for both tasks, that the SDP 2015 shared tasks are an extension of the previous year, and that the scores for the submissions only saw an improvement the second year.
+In this Section we will examine a set of state-of-the art semantic dependency parsers. As mentioned previously, we will examine the submissions from the SDP 2015, and not include the results from SDP 2014. This choice is based on the observation that many of the same teams submitted for both tasks, that the SDP 2015 shared tasks are an extension of the previous year, and that the scores of the submitted results saw an increase in overall performance.
 
-We can observe the performance of the SDP 2015 parsers in Table \ref{fig:results}, which have been reproduced from \citeA{Oepen:15}. There where 6 teams that submitted results from their parsing systems. Each team could submit two runs per track, and it is the best run (if more than one run were submitted) that is presented in Table \ref{fig:results}. The evaluation of each parser is based on the accuracy of the dependency graphs that they produce on the test set mentioned above, measured against the gold-standard testing data. The evaluation itself is based on the metrics: 
+We can observe the performance of the SDP 2015 parsers in Table \ref{fig:results}, which have been reproduced from \citeA{Oepen:15}. There where 6 teams that submitted results from their parsing systems. Each team could submit two runs per track, and it is the best run (if more than one run were submitted) that is presented in Table \ref{fig:results}. 
+
+The submissions could be made to different tracks. There was a \textit{closed} track: where systems could only use gold-standard semantic dependencies distributed by the organisers of the SDP 2015 shared task for training. There was also an \textit{open} track: here the teams could use other resources, such as a syntactic parser, insofar as these did not use any methodology where the gold-standard syntactic or semantic analysis of the tasks test data had been used in any way. For the open track, the organisers made available already parsed syntactic analysis of the training data. There was also a so-called idealized \textit{gold} track where gold-standard syntactic companion files in a variety of formats was provided for training \cite{Oepen:15}.
+
+The evaluation of each parser is based on the accuracy of the dependency graphs that they produce on the test set mentioned above, measured against the gold-standard testing data. The evaluation itself is based on the metrics: 
 
 \begin{enumerate}
     \item Labeled precision, recall, and F$_1$, referred to as LP, LR and LF.
@@ -234,15 +236,15 @@ We can observe the performance of the SDP 2015 parsers in Table \ref{fig:results
     \item Both complete predications and semantic frames evaluations are limited to those predicates that correspond to verbal parts of speech, as determined by the gold-standard part of speech.
 \end{enumerate}
 
-We will now examine each teams submissions in their own right.
+We will now examine the parsing systems of each team.
 
-\paragraph{Turku} 
+\paragraph{Peking} This team used the graph-to-tree transformation of \citeA{Du:Peking:14} as a basis for their system. This approach converts the training data that consists of semantic dependency graphs, into tree structures. After the conversion is done, well-established methods for parsing dependency trees are used in order to train a parser. 
 
-\paragraph{Lisbon}
+\paragraph{Riga} As the team behind Peking, this team also used the graph-to-tree transformation of \citeA{Du:Peking:14} as a basis for their system. \cite{Barzdins:Riga:15}.
 
-\paragraph{Peking}
+\paragraph{Turku} \cite{Kanerva:Turku:14} \cite{Kanerva:Turku:15}.
 
-\paragraph{Riga}
+\paragraph{Lisbon} 
 
 \paragraph{Minsk}
 
