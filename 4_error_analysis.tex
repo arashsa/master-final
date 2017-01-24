@@ -10,43 +10,123 @@
 % Lisbon: A graph algorithm
 
 
-In this chapter we will examine the results of SemEval-2015 for the Peking, Turku and Lisbon systems described in the previous chapter. The aim of this comparative analysis is twofold:
+In this chapter we present an in-depth contrastive error analysis of the results of SemEval-2015 for the Peking, Turku and Lisbon systems described in Chapter \ref{chap:semantic}. The aim of this comparative analysis is twofold:
 
 \begin{enumerate}
-    \item To find differences in the results among a chosen set of parsing systems in order to compare and contrast their strengths and weaknesses.
-    \item Empirically identify and verify which types of errors that can be the focus of future research on semantic dependency parsing.
+    \item To find similarities and differences in the results among a chosen set of parsing systems in order to compare and contrast their strengths and weaknesses.
+    \item To empirically identify and verify which types of errors that can be the focus of future research on improving the accuracy of semantic dependency parsing.
 \end{enumerate}
 
-From such an analysis we want to examine if there is grounds to extrapolate from more fine grained observations to general ones, i.e. to make general assumptions based on the empirical observations. The three systems that we will examine: Peking, Turku, and Lisbon, have been chosen based on two factors:
+There where 6 submissions to SemEval-2015, including an `in-official' submission by a sub-set of the task organizers. We have made the choice of focusing on the three parsing systems in this analysis based on a set of criteria:
 
 \begin{enumerate}
-    \item They are among the parsing systems with the highest overall scores in SemEval-2015. 
-    \item The chosen parsing systems should are based on different algorithms, and include both the local transition-based and global graph-based models that we examined in Chapter \ref{chap:background}.
+    \item The chosen systems showed the highest overall scores in SemEval-2015.
+    \item The technical approach of the three parsing systems are different from one another: both the local transition-based and global graph-based models that we examined in Chapter \ref{chap:background} are represented.
+    \item The submission that use a similar technical approach, we exclude the system producing the lowest overall accuracy score, such as in the case of the Peking and Riga systems.
 \end{enumerate}
 
-We will argue that the analysis presented in this chapter can highlight the correlation between the specific types of errors that these parsers make and their theoretical foundation. The analysis presented is thus based on the general knowledge of the parsing systems, as described in Chapter \ref{chap:semantic}, and the specific observations made in our analysis of their results from SemEval-2015.
+% We will argue that the analysis presented in this chapter can highlight the correlation between the specific types of errors that these parsers make and their theoretical foundation. The analysis presented is thus based on the general knowledge of the parsing systems, as described in Chapter \ref{chap:semantic}, and the specific observations made in our analysis of their results from SemEval-2015.
 
-In our analysis we take inspiration from a similar study performed by \citeA{McD:Niv:07}, where a comparative analysis of a set of syntactic parsers has been performed. This study focuses on three types of errors: (1) length factors, (2) graph factors, and (3) linguistic factors. We will structure our analysis accordingly, and include a fourth type of errors that examine the multi-classification task of frame predication.
+In our analysis we draw inspiration from three similar studies performed by \citeA{McD:Niv:07}, \citeA{McD:Niv:11}, and \citeA{Choi:Tetreaul:Stent:15}. In these studies a comparative analysis of a set of syntactic parsers is presented where various types of errors are highlighted. The first and second study focus on three types of errors: (1) length factors, (2) graph factors, and (3) linguistic factors. The third study, in addition to these three factors, also examine the speed of parsers. We will structure our analysis in a similar fashion, but exclude speed, and include a fourth type of error where we examine the multi-classification task of frame predication that we discussed in Chapter \ref{chap:semantic}.
+
+In addition to narrowing down the scope in terms of choosing three parsing systems, we also exclude results for the PAS target representation. The reasoning behind this is the fact that the DM and PAS target representations are relatively similar, which we can observe in Table \ref{fig:data}, where we observe similar number for the number of labels, percentage of graphs being trees, percentage of projective dependencies, etc. 
+
+The only major difference is the percentage of so-called singletons, i.e. nodes outside the graph, where the DM and PSD representation have approximately 5 and 8 times as many singletons as PAS. With the exception of the singletons, we assume that our analysis of the DM results will yield similar results as PAS. In our experiments we ran tests on PAS in order to verify this hypothesis.
+
+However, before we embark on our in-depth contrastive error analysis, we recap overall statistics on the three parsing systems that are the basis for our analysis.
+
+\section{Overall Accuracy}
+
+\begin{table}
+    \centering
+    \begin{tabular}{@{}cccccccccc@{}}
+        \toprule
+        \multicolumn{1}{c}{ }
+        & \multicolumn{1}{c}{ }
+        & \multicolumn{4}{c}{\textbf{DM}}
+        & \multicolumn{4}{c}{\textbf{PSD}} \\
+        \cmidrule(lr){3-6}
+        \cmidrule(lr){7-10}
+        &
+        LF.av &
+        LF & LP & LR & FF &
+        LF & LP & LR & FF \\
+        \midrule
+        Lisbon* & 86.23 & 89.44 & 90.52 & 88.39 & 00.20 & 77.58 & 79.88 & 75.41 & 00.06 \\
+        Peking & 85.33 & 89.09 & 90.93 & 87.32 & 63.08 & 75.66 & 78.60 & 72.93 & 49.95 \\
+        Lisbon & 85.15 & 88.21 & 89.84 & 86.64 & 00.15 & 76.36 & 78.62 & 74.23 & 00.03 \\
+        Turku* & 83.47 & 86.17 & 87.80 & 84.60 & 54.67 & 73.63 & 76.10 & 71.32 & 53.20 \\
+        \bottomrule
+        
+        \\
+        \toprule
+        \multicolumn{1}{c}{ }
+        & \multicolumn{1}{c}{ }
+        & \multicolumn{4}{c}{\textbf{DM}}
+        & \multicolumn{4}{c}{\textbf{PSD}} \\
+        \cmidrule(lr){3-6}
+        \cmidrule(lr){7-10}
+        &
+        LF.av &
+        LF & LP & LR & FF &
+        LF & LP & LR & FF \\
+        \midrule
+        Lisbon* & 82.53 & 83.77 & 85.79 & 81.84 & 00.35 & 76.18 & 80.12 & 72.61 & 02.25 \\
+        Lisbon & 81.15 & 81.75 & 84.81 & 78.90 & 00.27 & 74.82 & 78.68 & 71.31 & 02.09 \\
+        Peking & 80.78 & 81.84 & 84.29 & 79.53 & 47.49 & 73.28 & 77.36 & 69.61 & 34.28 \\
+        Turku* & 78.85 & 79.01 & 81.54 & 76.63 & 39.15 & 71.59 & 74.92 & 68.55 & 38.75 \\
+        \bottomrule
+    \end{tabular}
+    \caption{SemEval-2015 results from the open track (marked *) and closed track (unmarked) of the in-domain (top) and out-of-domain (bottom) data for the three parsers included our the analysis.}
+    \label{fig:data:recap}
+\end{table}
+
+In Chapter \ref{chap:semantic} we reviewed the technical aspects of the three parsing systems we will examine here. The Peking system: an ensemble of transition-based and graph-based models, the Turku system: a combination of several classifiers for specific aspects of the semantic dependency graphs, and the Lisbon system: a graph-based feature-rich linear model that parametrize globally over first and second order dependencies. In Table \ref{fig:data:recap} we see the performance of these parsers. 
+
 
 \section{Length factors}
 
-As \citeA{McD:Niv:07} point out, it is well known that syntactic parsing systems produce results with lower accuracy for longer sentences. We observe the same phenomena in the results from our chosen set of parsers from SemEval-2015. Parsing accuracy is highly correlated with sentence length.
+As \citeA{McD:Niv:07} point out, it is well known that syntactic parsing systems produce results with lower accuracy for longer sentences. We observe the same phenomena in the results from our chosen set of parsers from SemEval-2015. Parsing accuracy is highly correlated with sentence length. \citeA{McD:Niv:11} claim that this is primarily due to more complex constructions in longer sentences, such as prepositions, conjunctions, and multi-class sentences. 
 
 Another type of length factor is the length of dependencies, which also has an impact on the accuracy of predictions. We define the length of a dependency from word $w_i$ to $w_j$ as $j - i$. For the English language, and from examining the data sets used in SemEval-2015, we can generally state that short dependencies are modifiers of nouns, such as determiners, adjectives or pronouns. Longer dependencies are in most cases words that modify the main verb or root of the sentence. 
 
-Both sentence and dependency length have a distribution in the data sets where the frequency of a length factor is correlated with the accuracy for parsing that specific length. The higher the frequency of a given length factor, the more likely that the parsing system has a higher accuracy when parsing a sentence or dependency with a given length. It is therefore important not to exaggerate the importance of the length factor itself, but rather the distribution with which it occurs in the data used for training. So a different data set and distribution would result in, if our assumptions are correct, parsing systems with a different correlation between length and accuracy. However, since we are dealing with natural language, we can also assume that a relatively similar distribution of sentence and dependency length that we observe in the SemEval-2015 data sets will occur in other corpora.
+\subsection{Sentence length}
+
+In Figure \ref{fig:sentence_length}, we can observe the length of the sentences in the SemEval-2015 test data sets.
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=\textwidth]{sentence_lengths}
+\caption{The length of sentences in the data sets.}
+\label{fig:sentence_length}
+\end{figure}
+
+\subsection{Dependency length}
+
+
+% conclusion
+Both sentence and dependency length have a distribution in the data sets where the frequency of a length factor is correlated with the accuracy for parsing that specific length. The higher the frequency of a given length factor, the more likely that the parsing system has a higher accuracy when parsing a sentence or dependency with a given length. It is therefore important not to exaggerate the importance of the length factor itself, but rather the distribution with which it occurs in the data used for training. So a different data set and distribution would result in, if our assumptions are correct, parsing systems with a different correlation between length and accuracy. 
+
+However, since we are dealing with natural language, we can also assume that a relatively similar distribution of sentence and dependency lengths observed in the SemEval-2015 data sets will be prevalent in other annotated corpora. We will now turn our attention to specific graph factors, such as distance to root, projectivity, and singletons, and examine the accuracy of the three parsing systems in relation to these aspects of semantic dependency parsing.
 
 \section{Graph factors}
+% distance to root
+% projectivity
+% singletons
 
 \section{Linguistic factors}
+% part of speech
+% labels
 
 \section{Frames}
-
-\subsection{Predicting frames}
+% just frames
+% complete frames
 
 \section{Conclusions}
 
+In this chapter we have examined the results of Peking, Turku and Lisbon parsing systems as submitted to SemEval-2015. Our examinations have uncovered some interesting phenomena, such as the fact that the overall accuracy of all parsing systems drop in correlation to sentence and dependency length. That the parsing systems are more prone to error in regards to certain graph and linguistic factors, and that these are highly correlated with the frequency with which these factors are represented in the data sets.
 
+However, the error analysis did not produce enough evidence to build an overall strategy for improving upon the results of the three semantic dependency parsers examined in this chapter. As mentioned in previously, we have instead chosen to focus on improving the accuracy on the classification task of predicting semantic frames. This aspect of semantic dependency parsing is not well researched, and the results of our analysis seem to indicate that there can be room for improvements on previous research in this area.
 
 % Input for graph images
 % \begin{figure}[h]
