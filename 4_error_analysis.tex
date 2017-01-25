@@ -10,19 +10,20 @@
 % Lisbon: A graph algorithm
 
 
-In this chapter we present an in-depth contrastive error analysis of the results of SemEval-2015 for the Peking, Turku and Lisbon systems described in Chapter \ref{chap:semantic}. The aim of this comparative analysis is twofold:
+In this chapter we present an in-depth contrastive error analysis of the results of SemEval-2015 for the Peking, Turku and Lisbon systems described in Chapter \ref{chap:semantic}. As mentioned in the previous chapter, there where 6 submissions to SemEval-2015, including an `in-official' submission by a sub-set of the task organizers. We have made the choice of focusing on three of these parsing systems in our analysis. This is based on three criteria:
 
 \begin{enumerate}
-    \item To find similarities and differences in the results among a chosen set of parsing systems in order to compare and contrast their strengths and weaknesses.
-    \item To empirically identify and verify which types of errors that can be the focus of future research on improving the accuracy of semantic dependency parsing.
+    \item The chosen systems have the highest overall scores in SemEval-2015.
+    \item The technical approach of the three parsing systems are different from one another: both the local transition-based and global graph-based models that we examined in Chapter \ref{chap:background} are represented.
+    \item When choosing between submissions where similar technical approach has been used, we exclude the system with the overall lower accuracy score.
 \end{enumerate}
 
-There where 6 submissions to SemEval-2015, including an `in-official' submission by a sub-set of the task organizers. We have made the choice of focusing on the three parsing systems in this analysis based on a set of criteria:
+The aim of our in-depth contrastive error analysis is to gain insight into the state-of-the-art in semantic dependency parsing. We perform our study in order to:
 
 \begin{enumerate}
-    \item The chosen systems showed the highest overall scores in SemEval-2015.
-    \item The technical approach of the three parsing systems are different from one another: both the local transition-based and global graph-based models that we examined in Chapter \ref{chap:background} are represented.
-    \item The submission that use a similar technical approach, we exclude the system producing the lowest overall accuracy score, such as in the case of the Peking and Riga systems.
+    \item Find similarities and differences in the results among a chosen set of parsing systems in order to compare and contrast their strengths and weaknesses.
+    \item Empirically identify and verify which types of errors that can be the focus of future research on improving the accuracy of the state-of-the-art in semantic dependency parsing.
+    \item Examine whether an ensemble method based on the strengths of different parsing systems is possible in order to improve upon existing systems.
 \end{enumerate}
 
 % We will argue that the analysis presented in this chapter can highlight the correlation between the specific types of errors that these parsers make and their theoretical foundation. The analysis presented is thus based on the general knowledge of the parsing systems, as described in Chapter \ref{chap:semantic}, and the specific observations made in our analysis of their results from SemEval-2015.
