@@ -28,11 +28,9 @@ The aim of our in-depth contrastive error analysis is to gain insight into the s
 
 % We will argue that the analysis presented in this chapter can highlight the correlation between the specific types of errors that these parsers make and their theoretical foundation. The analysis presented is thus based on the general knowledge of the parsing systems, as described in Chapter \ref{chap:semantic}, and the specific observations made in our analysis of their results from SemEval-2015.
 
-In our analysis we draw inspiration from three similar studies performed by \citeA{McD:Niv:07}, \citeA{McD:Niv:11}, and \citeA{Choi:Tetreaul:Stent:15}. In these studies a comparative analysis of a set of syntactic parsers is presented where various types of errors are highlighted. The first and second study focus on three types of errors: (1) length factors, (2) graph factors, and (3) linguistic factors. The third study, in addition to these three factors, also examine the speed of parsers. We will structure our analysis in a similar fashion, but exclude speed, and include a fourth type of error where we examine the multi-classification task of frame predication that we discussed in Chapter \ref{chap:semantic}.
+In our analysis we draw inspiration from three similar studies performed by \citeA{McD:Niv:07}, \citeA{McD:Niv:11}, and \citeA{Choi:Tetreaul:Stent:15}. In these studies a comparative analysis of a set of syntactic parsers is presented where various types of errors are highlighted. The first and second study focus on three types of errors: (1) length factors, (2) graph factors, and (3) linguistic factors. The third study, in addition to these three factors, also examine the speed of parsers. We will structure our analysis in a similar fashion, but exclude speed, and include a fourth type error analysis where we examine the multi-classification task of frame predication.
 
-In addition to narrowing down the scope in terms of choosing three parsing systems, we also exclude results for the PAS target representation. The reasoning behind this is the fact that the DM and PAS target representations are relatively similar, which we can observe in Table \ref{fig:data}, where we observe similar number for the number of labels, percentage of graphs being trees, percentage of projective dependencies, etc. 
-
-The only major difference is the percentage of so-called singletons, i.e. nodes outside the graph, where the DM and PSD representation have approximately 5 and 8 times as many singletons as PAS. With the exception of the singletons, we assume that our analysis of the DM results will yield similar results as PAS. In our experiments we ran tests on PAS in order to verify this hypothesis.
+In addition to narrowing down the scope in terms of choosing three parsing systems, we also exclude results for the PAS target representation. The reasoning behind this is that the DM and PAS target representations are relatively similar. Examining Table \ref{fig:data} in Chapter \ref{chap:semantic}, we observe that DM and PAS are close to identical in the number of labels, percentage of graphs being trees, and percentage of dependencies being projective. The major difference between the two target representations is the percentage of so-called singletons, i.e. nodes outside the graph. The DM target representation has approximately 5 times as many singletons as PAS. With the exception of singletons, we assume that our analysis of the DM results will yield similar results as PAS. This hypothesis was confirmed when running our parts of our analysis on PAS.
 
 However, before we embark on our in-depth contrastive error analysis, we recap overall statistics on the three parsing systems that are the basis for our analysis.
 
@@ -53,9 +51,9 @@ However, before we embark on our in-depth contrastive error analysis, we recap o
         LF & LP & LR & FF &
         LF & LP & LR & FF \\
         \midrule
-        Lisbon* & 86.23 & 89.44 & 90.52 & 88.39 & 00.20 & 77.58 & 79.88 & 75.41 & 00.06 \\
         Peking & 85.33 & 89.09 & 90.93 & 87.32 & 63.08 & 75.66 & 78.60 & 72.93 & 49.95 \\
         Lisbon & 85.15 & 88.21 & 89.84 & 86.64 & 00.15 & 76.36 & 78.62 & 74.23 & 00.03 \\
+        Lisbon* & 86.23 & 89.44 & 90.52 & 88.39 & 00.20 & 77.58 & 79.88 & 75.41 & 00.06 \\
         Turku* & 83.47 & 86.17 & 87.80 & 84.60 & 54.67 & 73.63 & 76.10 & 71.32 & 53.20 \\
         \bottomrule
         
@@ -72,9 +70,9 @@ However, before we embark on our in-depth contrastive error analysis, we recap o
         LF & LP & LR & FF &
         LF & LP & LR & FF \\
         \midrule
-        Lisbon* & 82.53 & 83.77 & 85.79 & 81.84 & 00.35 & 76.18 & 80.12 & 72.61 & 02.25 \\
         Lisbon & 81.15 & 81.75 & 84.81 & 78.90 & 00.27 & 74.82 & 78.68 & 71.31 & 02.09 \\
         Peking & 80.78 & 81.84 & 84.29 & 79.53 & 47.49 & 73.28 & 77.36 & 69.61 & 34.28 \\
+        Lisbon* & 82.53 & 83.77 & 85.79 & 81.84 & 00.35 & 76.18 & 80.12 & 72.61 & 02.25 \\
         Turku* & 78.85 & 79.01 & 81.54 & 76.63 & 39.15 & 71.59 & 74.92 & 68.55 & 38.75 \\
         \bottomrule
     \end{tabular}
@@ -82,7 +80,11 @@ However, before we embark on our in-depth contrastive error analysis, we recap o
     \label{fig:data:recap}
 \end{table}
 
-In Chapter \ref{chap:semantic} we reviewed the technical aspects of the three parsing systems we will examine here. The Peking system: an ensemble of transition-based and graph-based models, the Turku system: a combination of several classifiers for specific aspects of the semantic dependency graphs, and the Lisbon system: a graph-based feature-rich linear model that parametrize globally over first and second order dependencies. In Table \ref{fig:data:recap} we see the performance of these parsers. 
+In Chapter \ref{chap:semantic} we reviewed the technical aspects of the three parsing systems we will examine here. The Peking system: an ensemble of transition-based and graph-based models, the Turku system: a combination of several classifiers for specific aspects of the semantic dependency graphs, and the Lisbon system: a graph-based feature-rich linear model that parametrize globally over first and second order dependencies.
+
+In Table \ref{fig:data:recap} we can see the performance of the three parsers. An obvious aspect of the results is that the parsing systems perform better on the in-domain versus the out-of-domain data sets. This is to be expected, as data-driven parsing will perform better on data that resembles the data used for training.
+
+The predictions could be run in an open and closed track, which we described in Chapter \ref{chap:semantic}. Lisbon is the only team that participated in both tracks, Peking in the open and Turku in the closed. 
 
 
 \section{Length factors}
@@ -92,15 +94,6 @@ As \citeA{McD:Niv:07} point out, it is well known that syntactic parsing systems
 Another type of length factor is the length of dependencies, which also has an impact on the accuracy of predictions. We define the length of a dependency from word $w_i$ to $w_j$ as $j - i$. For the English language, and from examining the data sets used in SemEval-2015, we can generally state that short dependencies are modifiers of nouns, such as determiners, adjectives or pronouns. Longer dependencies are in most cases words that modify the main verb or root of the sentence. 
 
 \subsection{Sentence length}
-
-In Figure \ref{fig:sentence_length}, we can observe the length of the sentences in the SemEval-2015 test data sets.
-
-\begin{figure}[h]
-\centering
-\includegraphics[width=\textwidth]{sentence_lengths}
-\caption{The length of sentences in the data sets.}
-\label{fig:sentence_length}
-\end{figure}
 
 \subsection{Dependency length}
 
