@@ -1,7 +1,267 @@
-\chapter{Experiments - Predicting Semantic Frames}
+\chapter{Predicting Semantic Frames}
 \label{chap:experiments}
 
-% Keras with Tensorflow
-% Recurrent nerual net (RNN) for training and predication. Used for solving many NLP tasks.
+In this chapter we will examine and present the results of a set of experiments leading to the creation of a classifier for predicting semantic frames. We will use the data sets presented in Chapter \ref{chap:semantic} for training, development and testing. As in our analysis of the results of the three parsing systems in Chapter \ref{chap:analysis}, we use the DM and PSD target representations, as the PAS target representation does not have annotations for semantic frames.
 
-In this chapter we will present our own pipeline for predicting semantic frames. 
+We will run our experiments and build our classifier on two different feature sets:
+
+\begin{enumerate}
+    \item Classifying semantic frames based on features that are lexical, morphological and syntactic. 
+    \item Classifying semantic frames based on features that are lexical, morphological, syntactic and semantic.
+\end{enumerate}
+
+This division is done so that we can distinguish classification results into two types of frame classification. The first set of experiments rely on information that would be available before semantic parsing. In this case our end results will be a classifier where the results can be used as data for a semantic dependency parser. The second set of experiments leads to a classifier that relies on a semantic dependency parser for its classification. In our case we have all the data for training, development and testing, and are therefore not reliant on additional resources such as sentence segmentation, tokeniser, lemmatiser, part of speech tagger, a syntactic and semantic dependency parser. However, if we where to use the classifiers in production, the first classifier would rely on these additional resources.
+
+We start this Chapter by discussing our experimental setup, i.e. how we prepare the data for training, development and testing. Then we move on to the machine learning methods used as basis for experiments: Decision Trees, Support Vector Machines, Logistic Regression and K-nearest neighbors. We give a concise, high-level overview of these four methods. We then move on to examine the features that we use as basis for training our machine learning models. In this part we show how each set of features influence the accuracy, precision, recall and f-score of our models. The mathematical definitions of these measures have already been presented in Chapter \ref{chap:analysis}. We end this chapter by running our two classifiers on the test data set.
+
+\section{Experimental setup}
+\label{setup}
+
+\begin{table}
+    \centering
+    \smaller[0.2]
+    \begin{tabular}{@{}llll@{}}
+        \toprule
+        \textbf{Type} & \textbf{\# Sentences} & \textbf{Frames} & \textbf{\# Frames} \\
+        \midrule
+        DM training & 28525 & 466 & 494122 \\
+        DM development & 7131 & 378 & 123128 \\
+        DM test id & 1410 & 290 & 24229 \\
+        DM test ood & 1849 & 299 & 23486 \\
+        \midrule
+        PSD training & 28525 & 5074 & 72006 \\
+        PSD development & 7131 & 2705 & 17387 \\
+        PSD test id & 1410 & 1174 & 3673 \\
+        PSD test ood & 1849 & 1265 & 3882 \\
+        \bottomrule
+    \end{tabular}
+    \caption{The data sets used for training, development and testing. The test set consists of in domain (id) and out of domain (ood) data.}
+    \label{table:split}
+\end{table}
+
+\begin{table}
+    \centering
+    \smaller[0.2]
+    \begin{tabular}{@{}llll@{}}
+        \toprule
+        \textbf{Type} & \textbf{\# Sentences} & \textbf{Frames} & \textbf{\# Frames} \\
+        \midrule
+        DM training & 28525 & 294 & 67493 \\
+        DM development & 7131 & 231 & 16295 \\
+        DM test id & 1410 & 162 & 3459 \\
+        DM test ood & 1849 & 173 & 3750 \\
+        \midrule
+        PSD training & 28525 & 4951 & 69669 \\
+        PSD development & 7131 & 2634 & 16761 \\
+        PSD test id & 1410 & 1141 & 3584 \\
+        PSD test ood & 1849  & 1209 & 3919 \\
+        \bottomrule
+    \end{tabular}
+    \caption{The data sets used for training, development and testing, but excluding frames on the basis of the rules of the SemEval-2015 evaluation criteria.}
+    \label{table:split:VandPred}
+\end{table}
+
+
+\begin{table}
+    \centering
+    \smaller[0.4]
+    \begin{tabular}{@{}llllll@{}}
+        \toprule
+        \textbf{Frame} & \textbf{Frequency} & \textbf{Percentage} & \textbf{Frame*} & \textbf{Frequency*} & \textbf{Percentage*} \\
+        \midrule
+        n:x & 115049 & 18.64 & n:x & 4529 & 18.69 \\
+        q:i-h-h & 72278 & 11.71 & q:i-h-h & 2891 & 11.93 \\
+        named:x-c & 62208 & 10.08 & named:x-c & 2549 & 10.52 \\
+        p:e-u-i & 54513 & 8.83 & p:e-u-i & 2061 & 8.51 \\
+        n\_of:x-i & 45542 & 7.38 & n\_of:x-i & 1614 & 6.66 \\
+        v:e-i-p & 34475 & 5.59 & v:e-i-p & 1342 & 5.54 \\
+        a:e-p & 27802 & 4.5 & a:e-p & 988 & 4.08 \\
+        card:i-i-c & 27128 & 4.39 & card:i-i-c & 902 & 3.72 \\
+        pron:x & 14187 & 2.3 & pron:x & 647 & 2.67 \\
+        n\_of:x & 12701 & 2.06 & n\_of:x & 510 & 2.1 \\
+        \midrule
+        Total & 465883 & 75.48  & Total & 18033 & 74.43 \\
+        \bottomrule
+    \end{tabular}
+    \caption{The frequency distribution of frames in the training and test in-domain (*) data for the DM target representation.}
+    \label{table:dm_frames_freq}
+\end{table}
+
+\begin{table}
+    \centering
+    \smaller[0.8]
+    \begin{tabular}{@{}llllll@{}}
+        \toprule
+        \textbf{Frame} & \textbf{Frequency} & \textbf{Percentage} & \textbf{Frame*} & \textbf{Frequency*} & \textbf{Percentage*} \\
+        \midrule
+        ev-w218f2 & 8355 & 9.35 & ev-w218f2 & 374 & 10.18 \\
+        ev-w2833f1 & 7482 & 8.37 & ev-w2833f1 & 350 & 9.53 \\
+        ev-w1566f3 & 1731 & 1.94 & ev-w1566f3 & 74 & 2.01 \\
+        ev-w1239f1 & 845 & 0.95 & ev-w2888f2 & 51 & 1.39 \\
+        ev-w218f3 & 821 & 0.92 & ev-w218f3 & 38 & 1.03 \\
+        ev-w2888f2 & 810 & 0.91 & ev-w410f1 & 31 & 0.84 \\
+        ev-w2772f1 & 801 & 0.9 & ev-w2875f4 & 29 & 0.79 \\
+        ev-w218f7\_u\_nobody & 657 & 0.73 & ev-w1239f1 & 28 & 0.76 \\
+        ev-w410f1 & 612 & 0.68 & ev-w2671f1 & 24 & 0.65 \\
+        ev-w3525f6 & 567 & 0.63 & ev-w3586f1 & 22 & 0.6 \\
+        \midrule
+        Total & 22681 & 25.37  & Total & 1021 & 27.8 \\
+        \bottomrule
+    \end{tabular}
+    \caption{The frequency distribution of frames in the training and test in-domain (*) data for the PSD target representation.}
+    \label{table:psd_frames_freq}
+\end{table}
+
+
+We have already explored the details of our data sets in Chapter \ref{chap:semantic}. In this section we focus on how we use the data to train, develop and test our machine learning models. As part of SemEval-2015, an official test data set was made available, and as such we do not need to set aside a test set. In order to have a data set for tuning and testing features, we must prepare a development set to run our experiments before we test our classifiers on the test set.
+
+In Table \ref{table:split} we can observe some higher order statistics on the training, development and test data sets. We have split the original training set using a 80-20 split, where we extract 20\% of the training data for tuning and development purposes. This is to ensure that we do not run our experiments on the test data set, and thus avoid over-fitting our machine learning models by selecting features that increase the accuracy of our models directly on the testing data. Once we are ready to run a final set of tests, we will train our classifiers on the whole training set, including the held out development set used for tuning purposes, and observe the accuracy of our models on the official test set.
+
+In Table \ref{table:split} we observe that the test data consists of in-domain and out-of-domain data. We will test our machine learning models on both these data sets in the final rounds of testing. Our hypothesis, based on the results of SemEval-2015 submissions, and general intuition of how machine learning models operate, is that the accuracy of our classifier will be lower on the out-of-domain data sets.
+
+Examining Table \ref{table:split} further, we see that the training data consists of 28525 sentences, the development data set of 7131 sentences, the in-domain test set of 1410 sentences and out-of-domain test set of 1849 sentences. For the DM target representation we observe a total of 494122 occurrences of frames in the training set, consisting of 466 unique frames. For the PSD training set, we observe 72006 occurrences of frames and a total number of 5074 unique frames. It is therefore important to note that due to the higher number of unique frames in the PSD data set, we can hypothesize that we will observe a relative drop in the accuracy of our classifier in comparison to the DM target representation.
+
+In evaluating the performance of our models, we follow the SemEval-2015 scoring scheme where we only evaluate frames for tokens that have a \textit{part of speech tag} that starts with the letter 'V'\footnote{Part of speech tags that are equal to `MD' should also have been included in this selection if the goal is to check for all possibly ambiguous verbs. Since we are interested in comparing our results to that of the SemEval-2015 submissions, we follow the scoring practices of the organisers.}, and are classified as being predicates\footnote{Details on evaluation can be found here: http://alt.qcri.org/semeval2015/task18/index.php?id=evaluation. However, the specific details on the exclusion of frames not starting with `V' and being a predicate are not present. This information was obtained by examining the scoring files included in the package with the training and testing data}, i.e. a node with outgoing dependency edges in the semantic dependency graph. This was done in order to only score frames on potentially ambiguous verbs. We do not use this information during training and predication. After the predictions have been made on all tokens that have a part of speech tag that start with a `V', we then have a post-processing step where we exclude for those tokens that are note predicates for our evaluation.
+
+In Table \ref{table:split:VandPred} we see higher order statistics on the frames that remain in the data sets once we exclude frames base on the SemEval-2015 scoring scheme. Both the number of unique frames and instances in the data sets have been reduced substantially. The instances of frames to be considered are now approximately the same, with DM and PSD in-domain data having 3459 and 3584 instances of frames to classify respectively, and 3750 and 3919 on the out-of-domain test data respectively. This makes it possible to have a more empirically similar base for comparing the results when classifying semantic frames on both target representations. However, the number of unique frames are still somewhat skewed, where the unique number of frames in both training and testing is substantially higher for PSD in comparison to DM.
+
+Examining Tables \ref{table:dm_frames_freq} and \ref{table:psd_frames_freq}, we see the frequency and percentage of the top 10 most frequent frames in both target representations. It is important to note that the DM target representation has a much higher percentage of its total number of frames (75.48\% in the training) in the top 10 in comparison with PSD (25.37\% in the training). Another interesting phenomena to notice is that the distribution of frames in the training and test data for DM has a very similar distribution. The top 10 frames are the same, approximately similar percentages of distribution. Whereas for the PSD target representation we see that there are some variations on the top 10 frames, where some of the most frequent frames in the top ten for the training data does not appear in the testing data.
+
+Now that we have some further insight into the data, we move onto an explanation of the type of feature selections we will examine in our experiments. 
+
+\section{Feature Selection}
+\label{features}
+
+\begin{figure}
+    \centering
+    \smaller[]
+    \smaller[]
+    % \tiny
+    \begin{dependency}[]
+        \begin{deptext}[column sep=0.5em, row sep=.1ex]
+            Bramalea \& said \& it \& expects \& to \& complete \& the \& issue \& by \& the \& end \& of \& the \& month \& . \\
+            
+            g\_p\_n \& say \& it \& expect \& to \& complete \& the \& issue \& by \& the \& end \& of \& the \& month \& \_ \\
+            
+            NNP \& VBD \& PRP \& VBZ \& TO \& VB \& DT \& NN \& IN \& DT \& NN \& IN \& DT \& NN \& . \\
+            
+            named:x-c \& v\_to:e-i-h-i \& pron:x \& v:e-i-h \& \_ \& v:e-i-p \& q:i-h-h \& n:x \& p:e-u-i \& q:i-h-h \& n\_of:x-i \& \_ \& q:i-h-h \& n:x \& \_ \\
+        \end{deptext}
+        \deproot{2}{root}
+        \depedge{2}{1}{ARG1}
+        \depedge{6}{3}{ARG1}
+        \depedge{4}{3}{ARG1}
+        \depedge{2}{4}{ARG2}
+        \depedge{9}{6}{ARG1}
+        \depedge{4}{6}{ARG2}
+        \depedge{6}{8}{ARG2}
+        \depedge{7}{8}{BV}
+        \depedge{9}{11}{ARG2}
+        \depedge{10}{11}{BV}
+        \depedge{11}{14}{ARG1}
+        \depedge{13}{14}{BV}
+    \end{dependency}
+    \caption{DM target representation with tokens, lemma, part of speech tags, semantic frames and labeled semantic dependencies.}
+    \label{DM:all}
+\end{figure}
+
+Feature selection is a process where we select the data that will be given to machine learning algorithms as basis for its learning. For each word, we extract a set of features that are fed to the machine learning algorithm as parameters for learning, and the frame as the class by which to classify given word. Once we have trained a model, we then encounter new words that we may or may not have seen in the training data, extract the same set of features as in the training, which is then given to the machine learning model in order to classify the given word with a frame.
+
+There are no well defined methods by which we can empirically select the features that will result in the most accurate model. This is due to the fact that the feature space that we could potentially construct is infinite, and we therefore have no way of testing all possible feature sets in order to find the set that will produce the most accuracy classifier. We must therefore heuristically select our features by examining their impact on the accuracy of our classifiers.
+
+When choosing features for our classifier we consider 3 factors:
+
+\begin{enumerate}
+    \item Improving accuracy: We aim for features that increase overall accuracy of our model.
+    \item Reducing over-fitting: We create a development set and perform 10-fold cross validation in order to reduce over-fitting to the data sets.
+    \item Reducing training and testing time: We employ a range of criteria for feature reduction in order to decrease training and testing time in order to perform a larger set of experiments.
+\end{enumerate}
+
+We have chosen to base our feature selection on 4 sets of feature types: lexical, morphological, syntactic and semantic. When we start our experiments we perform the feature selection in that order. Examining Figure \ref{DM:all}, we have an example taken from the training data which includes most of the information we will use as features. 
+
+\subsection{Lexical}
+
+\subsection{Morphological}
+
+\subsection{Syntactic}
+
+\subsection{Semantic}
+
+ 
+\section{Classification Algorithms}
+
+We have chosen a set of four classifiers for predicting semantic frames in order to have a variety of approaches where we can empirically find a machine learning approach that yields satisfactory results. We start this chapter by providing a short description of the four algorithms that we have chosen for our classification task. These four machine learning algorithms are all implemented and openly available as part of the scikit-learn toolkit.
+
+Scikit-learn is a high-level machine learning toolkit written in the Python programming language. The authors of scikit-learn describe the toolkit as a set of state-of-the art machine learning algorithms that have been designed for usage on medium-scale supervised and unsupervised problems \cite{scikit-learn}.
+
+It is worth noting that we ran the experiments on all four algorithms to a certain limit. Once we had established the classifier that consistently performed with the highest accuracy, we limited further explorations to that classifier. Since running the experiments on each classifier is time consuming, this decision was necessary once we started performing more in-depth feature selections. Our aim is to examine the possibilities of increasing the accuracy of frame detection to rival that of the current state-of-the-art.
+
+\subsection{Decision Trees}
+
+\textit{Decision Tree Classifiers} learn rules by creating a tree structure with simple rules that are easy to analyse and understand. This can be contrasted to more complex machine learning algorithms such as neural nets. In the latter cases the learning and predication is more like a `black-box' in terms of comprehensibility.
+
+The decision tree algorithm learns based on a set of labeled instances by inductively setting up a set of rules which will form a tree. Classification is done by starting at the root node, and base on the rules classify new data by traversing the tree and reaching a node that is designated a specific class from the previous learning. As Kotsiantis note, the process by which a decision tree classifier makes predictions is similar to a greedy search \cite{Kotsiantis:13}.
+
+The decision tree classifier that is part of the scikit-learn toolkit has a small set of options for creating different types of decision trees. The options include setting the split criteria, where the options are \textit{gini} and \textit{entropy}. As Kotsiantis note, gini and entropy are two different measure used as the splitting measure that the learning algorithm uses in order to create the decision trees \cite{Kotsiantis:13}.
+
+Our experiments showed that decision trees can be a fast and accurate machine learning algorithm for the multi-class classification task of frame detection. However, it did not score high enough to be considered for further exploration when we started doing our in-depth feature selections after the first two initial sets that included lexical and morphological features. The results of our experiments and further explorations are presented in Sections \ref{features} and \ref{results}.
+
+\subsection{Support Vector Machines}
+
+\textit{Support vector machines} are well suited for multi-class classification tasks, particularly when dealing with high dimensional feature sets used for training and predication. However, as Hsu and Lin note, at the time when support vector machines where created it was initially made for binary classification, but a number of methods have been constructed where support vector machines have been extended to handle multiple classes \cite{Hsu:02}.
+
+The scikit-learn toolkit has 3 implementations of support vector machines. After a few experiments, we ended up using the `LinearSVC' class, which is an wrapper around the `LIBLINEAR' library developed by  \citeA{liblinear}.
+
+The `LIBLINEAR' library is an open source library for large-scale linear classification. It is well suited for large data and feature sets, and it is particularly recommended for text classification by its developers. In certain cases it is also known to be faster than many support vector implementations, including the often used `LIBSVM' library \cite{liblinear}. The other scikit-learn support vector machine algorithms are based on `LIBSVM', which proved to be relatively slower once our feature sets grew to include syntactic and semantic features. We found that by using the `LinearSVC' class in the scikit-learn toolkit, we could reduce training time, and where thus capable of running a much larger set of feature sets for experimentation.
+
+Our experiments showed that support vector machines had the highest overall scores among the four machine learning algorithms that we examined. It is a versatile algorithm with a wide range of options for tuning. We therefore opted to use this machine learning approach once we started examining syntactic and semantic features.
+
+\subsection{Logistic Regression}
+
+Logistic regression is a machine learning model based on regression analysis. The implementation used in scikit-learn, like the support vector machine implementation described above, is also based on the `LIBLINEAR' library. The implementation is of a multivariate logistic regression model with the loss function being $log(1+e^{y_iw^Txi})$, which has been derived from a probabilistic model \cite{liblinear}. 
+
+We achieved relatively high accuracy using the logistic regression model at a training time that allowed for experimentation with different feature sets. However, as we saw that the support vector implementation scored relatively higher for all lexical and morphological features, we did not further test this algorithm once we started experimenting with syntactic and semantic features.
+
+\subsection{K-nearest neighbors}
+
+Nearest neighbors classification is a type of machine learning method where training data is stored directly in a model, and a computation is performed by way of a simple majority vote of the nearest neighbors of each point in the model. It is a non-parametric method used for both classification and regression, where in the classification we the output is a class, and in regression the output is the average of the values of its \textit{k} neighbors \cite{Altman:92}.
+
+We did not achieve comparably high accuracy using the k-nearest neighbors classifier implemented in the scikit-learn toolkit. We therefore opted to leave out this algorithm as well once we started our experiments with syntactic and semantic features.
+
+\section{Results}
+\label{results}
+
+We will now start reporting on the results of our experiments. Again, it is worth reminding the reader that the experiments are all run and tested on training and development data where we first learn and classify on all the frames in the training and development set, but the accuracy, precision, recall and F-score are all calculated using the scoring scheme of SemEval-2015. The scoring scheme allows only to evaluate results on frames for tokens that have part of speech tags that start with `V' and are predicates. 
+
+\subsection{Baseline}
+
+\begin{table}
+    \centering
+    \smaller[0.2]
+    \begin{tabular}{@{}lllll@{}}
+        \toprule
+        \textbf{Target representation} & \textbf{Accuracy} & \textbf{Precision} & \textbf{Recall} & \textbf{F-score} \\
+        \midrule
+        DM & 0.7369 & 0.7209 & 0.7370 & 0.7176\\ 
+        PSD & 0.6654 & 0.5863 & 0.6655 & 0.6147\\
+        \bottomrule
+    \end{tabular}
+    \caption{Baseline score with a most frequent frame per lemma approach.}
+    \label{table:baseline}
+\end{table}
+
+In order to have a starting point of departure for our experiments we first setup a baseline that we can compare further experiments with. There are several ways of setting up a baseline. For instance, in part of speech tagging, a useful baseline is a \textit{most frequent class}: given an ambiguous word, choose the part of speech tag that is most frequent in the training data \cite{Jur:Mar:09}. In part of speech tagging most words are unambiguous (80-86\%), and around 14-15\% of words are ambiguous. However, these words usually account for the most frequent words, so a corpora will still consist of around 55-67\% ambiguous words. Running a most frequent class baseline classifier for part of speech tagging on the WSJ corpus results in an accuracy of 92.34\% \cite{Jur:Mar:09}. State-of-the art part of speech taggers have been able to achieve accuracy score above 97\%, which is a significant increase from the mentioned baseline.
+
+Our baseline for detecting semantic frames uses a slightly different approach than that of the part-of-speech baseline. Our baseline is a \textit{most frequent class per lemma} approach. We give each lemma the most frequent frame for that current lemma. For lemmas that have not been encountered in the training, we give the \textit{most frequent frame}. The most frequent frame is calculated by finding the most frequency frame in the training data. 
+
+In Table \ref{table:baseline} we can examine the baseline results. We observe that the baseline for DM is significantly higher than PSD. 
+
+\subsection{Lexical}
+
+\subsection{Morphological}
+
+\subsection{Syntactic}
+
+\subsection{Semantic}
+
+\section{Conclusions}

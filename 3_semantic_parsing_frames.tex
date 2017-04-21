@@ -52,7 +52,7 @@ The data-sets that we will examine are all represented in the SDP format\footnot
         \depedge[edge unit distance=1.2ex]{11}{3}{ACT}
         \depedge[edge unit distance=.8ex]{6}{4}{EFF}
     \end{dependency}
-    \caption{PCEDT representation.}
+    \caption{PCEDT target representation.}
     \label{PCEDT}
 \end{figure}
 
@@ -80,7 +80,7 @@ The data-sets that we will examine are all represented in the SDP format\footnot
         \depedge{12}{11}{prep\_ARG1}
         \depedge{13}{14}{det\_ARG1}
     \end{dependency}
-    \caption{PAS representation.}
+    \caption{PAS target representation.}
     \label{PAS}
 \end{figure}
 
@@ -108,7 +108,7 @@ The data-sets that we will examine are all represented in the SDP format\footnot
         \depedge{11}{14}{ARG1}
         \depedge{13}{14}{BV}
     \end{dependency}
-    \caption{DM representation.}
+    \caption{DM target representation.}
     \label{DM}
 \end{figure}
 
@@ -131,7 +131,7 @@ The data-sets that we will examine are all represented in the SDP format\footnot
         \depedge[edge unit distance=2.1ex]{6}{11}{TWHEN}
         \depedge{11}{14}{APP}
     \end{dependency}
-    \caption{PSD representation.}
+    \caption{PSD target representation.}
     \label{PSD}
 \end{figure}
 
@@ -147,14 +147,14 @@ The data-sets that we will examine are all represented in the SDP format\footnot
 
 \paragraph{PSD: Prague Semantic Dependencies} The PCEDT target representation is used as basis for arriving at the PSD\footnote{See \url{http://tinyurl.com/h8dfkcz} for more technical details on the PSD target representation and conversion from PCEDT.} target representation. This is made using a conversion. The PCEDT representation consists of dependency structures that are always rooted trees. This is due to technical aspects of the conversion from the t-layers mentioned above, to the PCEDT data format. For the SemEval-2015 task, a conversion of the PCEDT data's t-layer was performed in order to reach true bi-lexical dependencies.
 
-\subsection{Frames}
+\subsection{Semantic frames}
 \label{sec:frames}
 
 The SemEval-2015 introduced frames, also referred to as sense distinctions, to the DM and PSD target representations. These are added as an extra layer to the sentence where multiple classes are used in order to add additional information on the content words of a sentence. If we examine the semantic dependency graphs in Figure \ref{DM} and \ref{PSD}, we see these classes below the sentence.
 
 According to \citeA{Oepen:16}, DM frames encode more general `linking patterns', which are mappings from syntactic to semantic arguments, whereas PSD represents actual sense identifiers and show different values for distinct lexemes. They note further that PSD only annotates senses on verbal predicates, while DM provide frame identifiers for all semantically contentful nodes. Additionally, \citeA{Oepen:15} note that the DM frames are limited to argument structure distinctions, e.g. causative vs. inchoative contrasts or differences in the arity or coarse semantic typing of argument frames. They further note that the PSD frames draw on much richer sense inventory, based on the EngValLex database \cite{Cinkova:06}.
 
-As we will see in Chapter \ref{chap:analysis}, we will focus on frames when in our own classification task in Chapter \ref{chap:experiments}. We will thus return to frames in these two chapters with a more in-depth analysis of the DM and PSD data sets, results of the parsers examined in this chapter, and a more exploratory approach to the frame classes themselves.
+As we will see in Chapter \ref{chap:analysis}, our analysis of the results of SemEval-2015 will lead us to further explore semantic frames and build our own \textit{frame classifier}. The details of this classifier and its results will be presented in Chapter \ref{chap:experiments}.
 
 \section{Data sets}
 \label{sec:data-sets}
@@ -163,8 +163,8 @@ The data-sets for the SemEval-2014 and 2015 vary slightly. In the SemEval-2014, 
 
 \begin{table}
     \centering
-    \smaller[0.5]
-    \begin{tabular}{@{}lcccccc@{}}
+    \smaller[0.2]
+    \begin{tabular}{@{}lrrrrrr@{}}
         \toprule
         & \multicolumn{3}{c}{In-domain}
         & \multicolumn{3}{c}{Out-of-domain} \\
@@ -182,7 +182,7 @@ The data-sets for the SemEval-2014 and 2015 vary slightly. In the SemEval-2014, 
         $\%_g$ fragmented & 6.55 & 0.23 & 0.69 & 4.71 & 0.65 & 1.73 \\
         $\%_n$ reentrancies & 27.44 & 29.36 & 11.42 & 26.14 & 29.36 & 11.46 \\
         $\%_g$ topless & 0.31 & 0.02 & – & 1.41 & – & – \\
-        \# top nodes & 0.9969 & 0.9998 & 1.1276 & 0.9859 & 1.0000 & 1.2645 \\
+        \% top nodes & 0.996 & 0.999 & 1.127 & 0.985 & 1.000 & 1.264 \\
         $\%_n$ non-top roots & 44.91 & 55.98 & 4.35 & 39.89 & 50.93 & 5.27 \\
         average treewidth & 1.30 & 1.72 & 1.61 & 1.31 & 1.69 & 1.50  \\
         maximum treewidth & 3 & 3 & 7  & 3 & 3 & 5 \\
