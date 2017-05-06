@@ -140,11 +140,11 @@ F-score is the so-called \textit{harmonic mean} of the precision and recall. The
     \text{F-score} = 2*\frac{\text{precision * recall}}{\text{precision + recall}}
 \end{equation*}
 
-Another measure that is often used as a way of measuring the performance of a system is its \textit{accuracy}. This measure is widely used in natural language processing tasks. We will use this measure in the Chapter \ref{chap:experiments} when we build our classifier. Accuracy is defined as the sum of correct predictions divided by the sum of all predictions:
+% Another measure that is often used as a way of measuring the performance of a system is its \textit{accuracy}. This measure is widely used in natural language processing tasks. We will use this measure in the Chapter \ref{chap:experiments} when we build our classifier. Accuracy is defined as the sum of correct predictions divided by the sum of all predictions:
 
-\begin{equation*}
-    \text{Accuracy} = \frac{\text{true positives + true negatives}}{\text{true positives + true negatives + false positives + false negatives}}
-\end{equation*}
+% \begin{equation*}
+%     \text{Accuracy} = \frac{\text{true positives + true negatives}}{\text{true positives + true negatives + false positives + false negatives}}
+% \end{equation*}
 
 
 \vspace{1ex}
@@ -316,8 +316,6 @@ Looking closer at Figure \ref{fig:singletons_pos}, we see that for the both targ
 
 A few cases do stand out when it comes to singletons. Again, referring to Figure \ref{fig:singletons_pos}, we see that for certain part of speech tags, the accuracy is quite dramatically different than the others. In DM this is the case for `VBZ' (verb, 3rd person singular present), `VBD' (verb, past tense), `POS' (possessive ending), `RP` (particle) and `RB' (adverb) tags. For the PSD target representation the `RB' (adverb) tag stand out. As we can see from Table \ref{fig:singletons}, the precision and recall of the Lisbon parsing system for the PSD target representation is quite higher than for DM.
 
-\subsection{Projective and non-projective dependencies}
-
 
 \section{Linguistic factors}
 % part of speech
@@ -378,6 +376,62 @@ If we examine Figure \ref{fig:lisbon_dep}, we have two graphs of the 20 most fre
 \section{Frames}
 % just frames
 % complete frames
+
+\begin{table}
+    \centering
+    \smaller[0.4]
+    \begin{tabular}{@{}llllll@{}}
+        \toprule
+        \textbf{Frame} & \textbf{Total} & \textbf{Percent} & \textbf{Frame*} & \textbf{Total*} & \textbf{Percent*} \\
+        \midrule
+        n:x & 115049 & 18.64 & n:x & 4529 & 18.69 \\
+        q:i-h-h & 72278 & 11.71 & q:i-h-h & 2891 & 11.93 \\
+        named:x-c & 62208 & 10.08 & named:x-c & 2549 & 10.52 \\
+        p:e-u-i & 54513 & 8.83 & p:e-u-i & 2061 & 8.51 \\
+        n\_of:x-i & 45542 & 7.38 & n\_of:x-i & 1614 & 6.66 \\
+        v:e-i-p & 34475 & 5.59 & v:e-i-p & 1342 & 5.54 \\
+        a:e-p & 27802 & 4.5 & a:e-p & 988 & 4.08 \\
+        card:i-i-c & 27128 & 4.39 & card:i-i-c & 902 & 3.72 \\
+        pron:x & 14187 & 2.3 & pron:x & 647 & 2.67 \\
+        n\_of:x & 12701 & 2.06 & n\_of:x & 510 & 2.1 \\
+        \midrule
+        Total & 465883 & 75.48  & Total & 18033 & 74.43 \\
+        \bottomrule
+    \end{tabular}
+    \caption{The frequency distribution of frames in the training and test id (marked *) id for the DM target representation.}
+    \label{table:dm_frames_freq}
+\end{table}
+
+\begin{table}
+    \centering
+    \smaller[0.7]
+    \begin{tabular}{@{}llllll@{}}
+        \toprule
+        \textbf{Frame} & \textbf{Total} & \textbf{Percent} & \textbf{Frame*} & \textbf{Total*} & \textbf{Percent*} \\
+        \midrule
+        ev-w218f2 & 8355 & 9.35 & ev-w218f2 & 374 & 10.18 \\
+        ev-w2833f1 & 7482 & 8.37 & ev-w2833f1 & 350 & 9.53 \\
+        ev-w1566f3 & 1731 & 1.94 & ev-w1566f3 & 74 & 2.01 \\
+        ev-w1239f1 & 845 & 0.95 & ev-w2888f2 & 51 & 1.39 \\
+        ev-w218f3 & 821 & 0.92 & ev-w218f3 & 38 & 1.03 \\
+        ev-w2888f2 & 810 & 0.91 & ev-w410f1 & 31 & 0.84 \\
+        ev-w2772f1 & 801 & 0.9 & ev-w2875f4 & 29 & 0.79 \\
+        ev-w218f7 & 657 & 0.73 & ev-w1239f1 & 28 & 0.76 \\
+        ev-w410f1 & 612 & 0.68 & ev-w2671f1 & 24 & 0.65 \\
+        ev-w3525f6 & 567 & 0.63 & ev-w3586f1 & 22 & 0.6 \\
+        \midrule
+        Total & 22681 & 25.37  & Total & 1021 & 27.8 \\
+        \bottomrule
+    \end{tabular}
+    \caption{The frequency distribution of frames in the training and test id (marked *) id for the PSD target representation.}
+    \label{table:psd_frames_freq}
+\end{table}
+
+In Table \ref{table:split:VandPred} we see higher order statistics on the frames that remain in the data sets once we exclude frames base on the SemEval-2015 scoring scheme. This scheme reduces the number of frames to be part of evaluation by only including frames for tokens that have a \textit{part of speech tag} that starts with the letter 'V'\footnote{Part of speech tags that are equal to `MD' should also have been included in this selection if the goal is to check for all possibly ambiguous verbs. Since we are interested in comparing our results to that of the SemEval-2015 submissions, we follow the scoring practices of the organizers.}, and are classified as being predicates\footnote{Details on evaluation can be found here: \url{https://tinyurl.com/msh6jr8}. However, the specific details on the exclusion of frames not starting with `V' and being a predicate are not present. This information was obtained by examining the scoring files included in the package with the training and testing data}, i.e. a node with outgoing dependency edges in the semantic dependency graph. This was done in order to only score frames on potentially ambiguous verbs.
+
+Both the number of unique frames and instances in the data sets have been reduced substantially. The instances of frames to be considered are now approximately the same, with DM and PSD in-domain data having 3459 and 3584 instances of frames to classify respectively, and 3750 and 3919 on the out-of-domain test data respectively. This makes it possible to have a more empirically similar base for comparing the results when classifying semantic frames on both target representations. However, the number of unique frames are still somewhat skewed, where the unique number of frames in both training and testing is substantially higher for PSD in comparison to DM.
+
+Examining Tables \ref{table:dm_frames_freq} and \ref{table:psd_frames_freq}, we see the frequency and percentage of the top 10 most frequent frames in both target representations. It is important to note that the DM target representation has a much higher percentage of its total number of frames (75.48\% in the training) in the top 10 in comparison with PSD (25.37\% in the training). Another interesting phenomena to notice is that the distribution of frames in the training and test data for DM has a very similar distribution. The top 10 frames are the same, approximately similar percentages of distribution. Whereas for the PSD target representation we see that there are some variations on the top 10 frames, where some of the most frequent frames in the top ten for the training data does not appear in the testing data.
 
 \section{Conclusions}
 

@@ -1,6 +1,8 @@
 \chapter{Introduction}
 \label{chap:introduction}
 
+% Motivere hva som er resultatet, hva har jeg gjort, og hvem som trenger det, hvilken spørsmål har du stilt.
+
 Semantic dependency parsing is a Natural Language Processing (NLP) task that aims at producing meaning representations at the sentence-level. We can state the aims of semantic dependency parsing as a way of expressing predicate-argument relations in order to answer the question of \textit{Who did What to Whom?} In this regard there is certainly an overlap between semantic dependency parsing  and \textit{semantic role labeling} (SRL). 
 
 The task of SRL is concerned with detecting the arguments of a predicate in a given sentence. Semantic dependency parsing usually has a broader scope than argument detection. In addition to the goals of SRL, semantic dependency parsing attempts to identify various semantic phenomena, such as negation, topicalization, relative clauses, and other scopal dependencies that are not part of the scope of SRL.
@@ -18,6 +20,6 @@ In this thesis we present our contribution to the field of semantic dependency p
 
 \paragraph{Chapter 4} builds on the previous chapter by examining the results submitted by a set of parsing systems to SemEval-2015. By way of an in-depth contrastive error analysis of a set of state-of-the-art parsers we gain insights into some common errors that these parsers share. We examine four factors of semantic dependency parsing: (1) length factors, (2) graph factors, and (3) linguistic factors and (4) frames accuracy. The insights from this chapter lay the empirical foundation for our own classification task.
 
-\paragraph{Chapter 5} examines our own pipeline for classifying semantic frames. The analysis in Chapter \ref{chap:semantic} led us in choosing semantic frames as the focal point of our own work. In this chapter we build a pipeline for classifying semantic frames by examining a set of machine learning algorithms. We start off by presenting a baseline accuracy, and see if we can improve upon this baseline by fine tuning the machine learning algorithms, and by way of exploring a set of features used for training. We show that by using a wide range of features for our classifier, we can achieve state-of-the-art results in prediciting semantic frames.
+\paragraph{Chapter 5} examines our own pipeline for classifying semantic frames. The analysis in Chapter \ref{chap:semantic} led us in choosing semantic frames as the focal point of our own work. In this chapter we build a pipeline for classifying semantic frames by examining a set of machine learning algorithms. We start off by presenting a baseline accuracy, and see if we can improve upon this baseline by fine tuning the machine learning algorithms, and by way of exploring a set of features used for training. We show that by using a wide range of features for our classifier, we can achieve state-of-the-art results in predicting semantic frames.
 
 \paragraph{Chapter 6} is a summary and conclusion of our thesis. Here we give a short overview of what we have achieved in our thesis, and discuss how this relates to the research on semantic dependency parsing at large. We also discuss the possibilities for future work that might benefit from the analysis and classification task performed in our thesis.

@@ -1,0 +1,386 @@
+\chapter{Experiments}
+\label{chap:results}
+
+In this chapter we will examine and present the results of a set of experiments leading to a semantic frame classifier. We will use the data sets presented in Chapter \ref{chap:analysis}, and \ref{chap:experiments} for training, development and testing. We will examine how each set of features, that we discussed in Chapter \ref{chap:experiments}, influence the precision, recall and f-score of our models. The mathematical definitions of these measures can be found in Chapter \ref{chap:analysis}. The end result of our experiments will be three different semantic frame classifiers. Once we have finished our experiments on the development data set, we present our final results by using the test data. Our results show that with rigorous experimentation with different combination of features, we where able to obtain state-of-the-art results for semantic frame classification.
+
+
+
+\section{Baseline}
+
+Before we start our experiments, we need to define a baseline in order to have a common denominator that we can evaluate our results against. There are no agreed upon standards for defining a baseline for classification tasks such as semantic frame detection. Statistical counting measures have been the standard in other tasks such as \textit{part of speech tagging}. We will use this approach as basis for our baseline.
+
+\begin{table}
+    \centering
+    \smaller[0.2]
+    \begin{tabular}{@{}lllll@{}}
+        \toprule
+        \textbf{Representation} & \textbf{Precision} & \textbf{Recall} & \textbf{F-score} \\
+        \midrule
+        DM & 72.09 & 73.70 & 71.76\\ 
+        PSD & 58.63 & 66.55 & 61.47\\
+        \bottomrule
+    \end{tabular}
+    \caption{Baseline score with a most frequent frame per lemma approach.}
+    \label{table:baseline}
+\end{table}
+
+An often used baseline in part of speech tagging is a \textit{most frequent class} approach: given an ambiguous word, assign to it the most frequent part of speech tag \cite{Jur:Mar:09}. In part of speech tagging most words are unambiguous (80-86\%), and we are therefore left with approximately 14-15\% of words where a mere count does not result in a correct tag. Running a most frequent class baseline classifier for part of speech tagging on the WSJ corpus results in an accuracy of 92.34\% \cite{Jur:Mar:09}. State-of-the art part of speech taggers have been able to achieve accuracy scores above 97\%, which is a significant increase from the baseline.
+
+Examining Tables \ref{table:dm_frames_freq} and \ref{table:psd_frames_freq} in Chapter \ref{chap:experiments}, we observe that the ten most frequent frames in both data sets account for 18.64\% and 9.35\% of all frames. Given the number of frames and their distribution, we will use the same approach as part of speech tagging and use a \textit{most frequent class per lemma} approach for our baseline. For each lemma in the development set, we assign to it the most frequent frame encountered for that lemma in the training set. For lemmas that have not been encountered in the training, we assign the overall \textit{most frequent frame} in the training data.
+
+In Table \ref{table:baseline}, we have listed the baseline using the most frequent frame per lemma approach. It is worth reminding that we evaluate the baseline, as with all experiments in this chapter, by only including tokens that have a part of speech tag that starts with the character `V' and is not a singleton. However, for training and predicting we only use the part of speech tag information, and it is only during scoring we use the singleton information. This is in accordance with the SemEval-2015 scoring scheme.
+
+We observe that the baseline for DM is significantly higher than PSD. We explain this discrepancy by noting that the PSD target representation consists of a much larger set of frames. If we examine frequent lemma, such as `be', `make', `'have', `take', `say', we observe that for such ambiguous verbs, the number of frames assigned in the PSD target representations is higher, and the distribution of the frames assigned are more uniform. A most frequent frame per lemma approach will therefore be less effective for PSD.
+
+Now that we have established a baseline we start with our first set of experiments using lexical and morphological features for our training.
+
+
+
+\section{Experiments}
+
+We start things off by examining a set of single features in order to establish some insights as to which single feature might have the most impact on the accuracy of our machine learning models. We also use this as basis for choosing which of the four machine learning algorithms we will continue using as basis for further experiments with multiple features.
+
+
+
+\subsection{Lexical}
+\label{results_lex}
+
+\begin{table}
+    \centering
+    \smaller[0.2]
+    \begin{tabular}{@{}llll@{}}
+        \toprule
+        \textbf{Classifier} & \textbf{Precision} & \textbf{Recall} & \textbf{F-score} \\
+        Support Vector Machine & 70.85  &  70.98  &  69.58  \\
+        Decision Tree & 71.05  &  70.89  &  69.60 \\
+        Logistic Regression & 67.04  &  68.00  &  65.34 \\
+        K-Nearest Neighbor & 69.32  &  63.44  &  65.00 \\
+        \midrule
+        Support Vector Machine & 66.91  &  66.88  &  64.83 \\
+        Decision Tree & 66.79  &  66.76  &  64.72 \\
+        Logistic Regression &  62.11 &   60.57 &   59.33 \\
+        K-Nearest Neighbor & 64.34  &  64.10  &  62.74 \\
+        \bottomrule
+    \end{tabular}
+    \caption{Results for \textit{form} as the sole feature, DM (top) and PSD (bottom).}
+    \label{table:form}
+\end{table}
+
+\begin{table}
+    \centering
+    \smaller[0.2]
+    \begin{tabular}{@{}llll@{}}
+        \toprule
+        \textbf{Classifier} & \textbf{Precision} & \textbf{Recall} & \textbf{F-score} \\
+        Support Vector Machine & 71.79    & 74.20    & 71.81  \\
+        Decision Tree & 71.67  & 74.12    & 71.74 \\
+        Logistic Regression & 69.97    & 72.98    & 70.00 \\
+        K-Nearest Neighbor & 69.61    & 68.18    & 67.60 \\
+        \midrule
+        Support Vector Machine & 58.55    & 66.47    & 61.39 \\
+        Decision Tree & 58.60 &  66.52    & 61.44 \\
+        Logistic Regression  & 55.43    & 63.22    & 58.23 \\
+        K-Nearest Neighbor & 55.69    & 63.30    & 58.40 \\
+        \bottomrule
+    \end{tabular}
+    \caption{Results for \textit{lemma} as the sole feature, DM (top) and PSD (bottom).}
+    \label{table:lemma}
+\end{table}
+
+\begin{table}
+    \centering
+    \smaller[0.2]
+    \begin{tabular}{@{}llll@{}}
+        \toprule
+        \textbf{Classifier} & \textbf{Precision} & \textbf{Recall} & \textbf{F-score} \\
+        Support Vector Machine & 75.67 & 74.01 & 72.68 \\
+        Decision Tree & 75.8 & 73.78 & 72.48 \\
+        Logistic Regression & 71.35 & 72.93 & 71.0 \\
+        K-Nearest Neighbor & 74.96 & 72.55 & 72.23 \\
+        \midrule
+        Support Vector Machine & 70.34 & 70.86 & 68.62 \\
+        Decision Tree & 69.86 & 70.1 & 68.02 \\
+        Logistic Regression  & 67.66 & 68.55 & 66.2 \\
+        K-Nearest Neighbor & 66.97 & 68.7 & 66.36 \\
+        \bottomrule
+    \end{tabular}
+    \caption{Results for \textit{form} and \textit{lemma} as features, DM (top) and PSD (bottom).}
+    \label{table:form_lemma}
+\end{table}
+
+\begin{table}
+    \centering
+    \smaller[0.2]
+    \begin{tabular}{@{}llll@{}}
+        \toprule
+        \textbf{Classifier} & \textbf{Precision} & \textbf{Recall} & \textbf{F-score} \\
+        Support Vector Machine & 85.20 & 84.44 & 84.10 \\
+        Decision Tree & 78.49 & 76.90 & 76.73 \\
+        Logistic Regression & 82.22 & 80.69 & 79.54 \\
+        K-Nearest Neighbor & 64.33 & 55.83 & 57.45 \\
+        \midrule
+        Support Vector Machine & 80.09 & 80.38 & 79.09 \\
+        Decision Tree & 77.51 & 74.19 & 74.53 \\
+        Logistic Regression & 71.31 & 71.90 & 69.85 \\
+        K-Nearest Neighbor & 44.14 & 37.05 & 37.24 \\
+        \bottomrule
+    \end{tabular}
+    \caption{Results for \textit{form} and a context window of $n=3$, DM (top) and PSD (bottom).}
+    \label{table:form_lemma_context=3}
+\end{table}
+
+The first feature we will examine is the \textit{form} of a token. We see our results in Table \ref{table:form}. It is interesting that for the PSD target representation we achieve higher f-score than the baseline on all machine learning algorithms with the exception of Logistic Regression. However, with the exception of Support Vector Machines, we also observe that we achieve lower recall than the baseline. This might be due to the relative uniform distribution of frames on ambiguous verbs in PSD, and as such a most frequent frame per lemma baseline will have a higher recall than precision. In comparison, in Table \ref{table:baseline} we observe that the difference between precision and recall is much higher for PSD than DM.
+
+In our next run we will examine how using \textit{lemma} as the sole feature, in the same way as in our baseline, impacts the learning. The results are presented in Table \ref{table:lemma}. We observe that the results are overall higher than using form as our sole feature for the DM target representation, but lower for PSD. Our hypothesis is that this is, as with our baseline score, an artifact of the number and distribution of frames across the target representations.
+
+We also attempted, for experimental purposes, to test our classifier with \textit{part of speech tags} as the sole feature. Our hypothesis was that we would achieve low results, which the scores confirmed. We will not report the numbers in a table, as they are not interesting, but the f-scores where all below 30\% for the 4 machine learning models. However, this does not mean that part of speech tags are not interesting as features for our models. In conjunction with lexical and other morphological features, we will show that part of speech tags in fact contribute to higher scores when we get to our section on morphological features.
+
+Let us now turn to combining lexical features. We start by examining whether the combination of form and lemma results in a higher score in comparison to using form or lemma in isolation. In Table \ref{table:form_lemma} we see that we achieve a slight increase for the DM target representation when compared to the results using just lemma, but a significant increase in PSD.
+
+For our next experiment we examine how the context window of a token, referred to as \textit{token n-grams}, might impact the accuracy of our machine learning models. We will present experiments using a context window of 3 tokens surrounding the main token: `form-3', `form-2', `form-1', `form', `form+1', `form+2', `form+3'. In Table \ref{table:form_lemma_context=3} we see the results of our run with a context window of $n=4$.
+
+For the single features that we experimented with previously, the distinctions in results between the machine learning algorithms where less significant. However, once we use a combination of features we observe that there is a higher degree of divergence. The Support Vector Machine algorithm achieves the highest score for both DM and PSD when using n-grams tokens by a significant margin. It is interesting to note that for the K-Nearest Neighbor Classifier we observed a decrease in score in comparison with previous results. This divergence was also observed while running other experiments with multiple features, and we therefore opted to focus solely on the Support Vector Machine algorithm as basis for our further experimentation.
+
+Let us now increase the feature window surrounding a \textit{form} with a larger $n$, and use both \textit{form} and \textit{lemma} as basis for the surrounding $n$ elements individually and in conjunction. Our context window will be ${\{n|n>2 \wedge n<8\}}$. Tables \ref{table:form_context}, \ref{table:lemma_context}, and \ref{table:form_lemma_context}, show the results for ${\{n|n>2 \wedge n<6\}}$. In Table \ref{table:form_context} the context window consists of form, and we see an increase from $n=3$ to $n=4$, for both DM and PSD, and then a decrease. This decrease continued as $n$ increased further, so we do not report scores for context windows that are higher. In Table \ref{table:lemma_context} we see the same numbers for lemma as the context window, but we have the highest number for $n=3$, and a higher score when compared to the previous table where we used form. When we combine form and lemma, as seen in Table \ref{table:form_lemma_context}, we do not get a higher score than just using lemma. 
+
+So in terms of the context window, it seems like the best feature set for our task is using lemma with a context window of $n=3$, which we will opt for when we start experimenting with morphological features. The results for this are an f-score of 86.58\% for DM and 83.20\% for PSD, which is so far the highest scores that we have achieved. We will now continue with these two as a new baseline for further experimentation.
+
+\begin{table}
+    \centering
+    \smaller[0.2]
+    \begin{tabular}{@{}lllll@{}}
+        \toprule
+        \textbf{Representation} & \textbf{N-gram} & \textbf{Precision} & \textbf{Recall} & \textbf{F-score} \\
+        DM & $n=3$ & 85.20 & 84.44 & 84.10 \\
+        PSD & $n=3$ & 80.09 & 80.38 & 79.09 \\
+        \midrule
+        DM & $n=4$  & 87.17 & 86.52 & 86.32 \\
+        PSD & $n=4$ & 83.20 & 83.66 & 82.41 \\
+        \midrule
+        DM & $n=5$  & 86.88 & 86.20 & 85.99 \\
+        PSD & $n=5$ & 82.54 & 83.09 & 81.73 \\
+        \bottomrule
+    \end{tabular}
+    \caption{Results for experiments with context windows of ${\{n|n>2 \wedge n<6\}}$ using only \textit{form} as the context window.}
+    \label{table:form_context}
+\end{table}
+
+\begin{table}
+    \centering
+    \smaller[0.2]
+    \begin{tabular}{@{}lllll@{}}
+        \toprule
+        \textbf{Representation} & \textbf{N-gram} & \textbf{Precision} & \textbf{Recall} & \textbf{F-score} \\
+        DM & $n=3$ & 87.34 & 86.67 & 86.58 \\
+        PSD & $n=3$ & 83.88 & 84.39 & 83.20 \\
+        \midrule
+        DM & $n=4$  & 87.07 & 86.46 & 86.32 \\
+        PSD & $n=4$ & 83.55 & 84.07 & 82.79 \\
+        \midrule
+        DM & $n=5$  & 86.7 & 86.12 & 85.97 \\
+        PSD & $n=5$ & 83.01 & 83.61 & 82.25 \\
+        \bottomrule
+    \end{tabular}
+    \caption{Results for experiments with context windows of ${\{n|n>2 \wedge n<6\}}$ using only \textit{lemma} as the context window.}
+    \label{table:lemma_context}
+\end{table}
+
+\begin{table}
+    \centering
+    \smaller[0.2]
+    \begin{tabular}{@{}lllll@{}}
+        \toprule
+        \textbf{Representation} & \textbf{N-gram} & \textbf{Precision} & \textbf{Recall} & \textbf{F-score} \\
+        DM & $n=3$ &  87.08 & 86.43 & 86.29 \\
+        PSD & $n=3$ & 83.39 & 83.98 & 82.71 \\
+        \midrule
+        DM & $n=4$  & 86.51 & 86.05 & 85.79 \\
+        PSD & $n=4$ & 82.80 & 83.48 & 82.10 \\
+        \midrule
+        DM & $n=5$  & 86.34 & 85.86 & 85.59 \\
+        PSD & $n=5$ & 82.37 & 83.26 & 81.81 \\
+        \bottomrule
+    \end{tabular}
+    \caption{Results for experiments with context windows of ${\{n|n>2 \wedge n<6\}}$ using \textit{lemma} and \textit{form} as the context window.}
+    \label{table:form_lemma_context}
+\end{table}
+
+
+
+
+\subsection{Morphological}
+\label{results_lex}
+
+% New baseline
+% 86.58\% for DM and 83.20\% for PSD
+
+\begin{table}
+    \centering
+    \smaller[0.2]
+    \begin{tabular}{@{}lllll@{}}
+        \toprule
+        \textbf{Representation} & \textbf{Precision} & \textbf{Recall} & \textbf{F-score} \\
+        DM &  87.46 & 86.81 & 86.71 \\
+        PSD & 84.04 & 84.40 & 83.30 \\
+        \midrule
+        DM &  86.46 & 85.85 & 85.69 \\
+        PSD & 81.66 & 81.91 & 80.76 \\
+        \midrule
+        DM &  86.23 & 85.63 & 85.45 \\
+        PSD & 80.79 & 80.91 & 79.81 \\
+        \midrule
+        DM &  87.67 & 87.00 & 86.92 \\
+        PSD & 84.00 & 84.43 & 83.27 \\
+        \midrule
+        DM &  86.18 & 85.54 & 85.37 \\
+        PSD & 80.71 & 80.87 & 79.76 \\
+        \bottomrule
+    \end{tabular}
+    \caption{Results for adding part of speech tags: concatenated to form (first), concatenated to lemma (second), concatenated to both form and lemma (third), as a feature on its own (fourth), and concatenated to both form and lemma, form and lemma as features on their own, and part of speech tag as a feature on its own (fifth).}
+    \label{table:pos}
+\end{table}
+
+
+\begin{table}
+    \centering
+    \smaller[0.2]
+    \begin{tabular}{@{}lllll@{}}
+        \toprule
+        \textbf{Representation} & \textbf{Precision} & \textbf{Recall} & \textbf{F-score} \\
+        DM &  87.67 & 87.00 & 86.92 \\
+        PSD & 84.00 & 84.43 & 83.27 \\
+        \midrule
+        DM &  88.52 & 88.27 & 88.08 \\
+        PSD & 84.24 & 85.51 & 84.02 \\
+        \midrule
+        DM &  88.51 & 88.26 & 88.07 \\
+        PSD & 84.25 & 85.52 & 84.02 \\
+        \bottomrule
+    \end{tabular}
+    \caption{Results for adding part of speech tags to the context window, concatenating to lemma (top), as their own features (middle), and a combination of both, where we have lemma as their own features, part of speech as their own features, and part of speech tags concatenated to the lemma (bottom).}
+    \label{table:pos_context}
+\end{table}
+
+\begin{table}
+    \centering
+    \smaller[0.2]
+    \begin{tabular}{@{}lllll@{}}
+        \toprule
+        \textbf{Representation} & \textbf{Precision} & \textbf{Recall} & \textbf{F-score} \\
+        DM &  88.69 & 88.29 & 88.20 \\
+        PSD & 84.13 & 85.53 & 83.99 \\
+        \midrule
+        DM &  88.37 & 88.03 & 87.89 \\
+        PSD & 83.69 & 85.05 & 83.50 \\
+        \midrule
+        DM &  88.56 & 88.15 & 88.06 \\
+        PSD & 84.06 & 85.42 & 83.89 \\
+        \midrule
+        DM &  86.54 & 86.03 & 85.93 \\
+        PSD & 82.40 & 84.03 & 82.24 \\
+        \bottomrule
+    \end{tabular}
+    \caption{Results for adding prefix to main form (first), suffixes to main form (second), both prefixes and suffixes to main form (third), and both prefixes and suffixes to the form its context window where $n=3$ (fourth).}
+    \label{table:affix_suffix}
+\end{table}
+
+The morphological features included in our experiments are part of speech tokens, suffixes and prefixes. We will examine their impact on the accuracy of our classifier by examining each on their own right, and then adding the features that has the highest impact in a similar fashion as the lexical experiments. 
+
+We start by adding part of speech tags to form and lemma tokens. We will concatenate the tags at the end of each token: <form\_pos> and <lemma\_pos>. We can see the results of our experiments in Table \ref{table:pos}. We have 5 set of experiments. The first we concatenate the part of speech token tag to the form token, leaving lemma as a feature on its own. We then do the opposite, concatenating the part of speech tag to the lemma, but leaving form as its own feature. We then concatenate the part of speech tag to both form and lemma. As a final run we combine all of the above: form and lemma as their own features, form and lemma concatenated with part of speech tag, and part of speech tag as its own separate feature. 
+
+From Table \ref{table:pos}, we observe that the various strategies of using part of speech tags yield similar results. We see that the two highest scores, for both DM and PSD, are when we either concatenate part of speech tags to form, and leave lemma as its own feature, or when we leave both form and lemma as their own features, and the part of speech tag as its own separate feature. However, overall the increase in precision, recall and f-score are relatively low in both cases, where form DM we see an increase from the previous best score of 86.58\% to 86.92\%, and 82.71\% to 83.27\% for PSD.
+
+The slight increase is likely caused by the disambiguation possible for verbs that are assigned a range of different part of speech tags, such as the verb `make', which have been assigned this set of tags: `VB', `VBZ', `VBG', `VBD', `VBN', `VBP'. 
+
+We will now examine how part of speech tags may affect the accuracy of our model by adding them to the context window. We will run 2 set of experiments: (1) adding part of speech tags to the context token lemma by concatenating them to the lemma as in our previous experiments, or by adding the part of speech tags as separate features. The results are reported in Table \ref{table:pos_context}. Similar to the results in Table \ref{table:pos}, we observe that using part of speech tags as separate features for the context window results in the most increase in accuracy. The highest scores are 88.08\% for DM and 84.02\% for PSD. With part of speech tags we have achieved a statistically significant increase in our scores with 1.5\% for DM and 0.82\% for PSD.
+
+We will now consider adding prefixes and suffixes as features. For prefixes and suffixes we add character n-grams where ${\{n|n>2 \wedge n<5\}}$. This ensures that we capture various types of prefixes and suffixes that may be constrained by character length, such as the suffixes `ing' and `ed'. It is difficult estimating the effect of adding such morphological features, as the increase in our score is minimal. In Table \ref{table:affix_suffix} we observe that only prefixing has an added impact on the score, the other experiments actually had a negative impact on the scores. We will therefore leave prefixes and suffixes outside the scope of further experiments and note that its impact is minimal.
+
+\subsection{Syntactic}
+\label{results_syn}
+
+% New baseline
+
+Syntactic dependencies are a very interesting set of features for frame detection. Ambiguous verbs such as `be', `make', `'have', `take', `say', have a variable set of syntactic dependencies that may have a relationship with their assigned frames. 
+
+Let us examine two sentences from our training set: (1) `It has no bearing on our work force today' and (2) `They have to do it'. In sentence (1) the frame for the verb `has' is `v:e-i-i', indicating that it is a verb that can take two objects, whereas in sentence (2) the verb has been assigned the frame `v\_qmodal:e-h', which is an indication that it is a modal auxiliary verb to the verb `do'. The frames are from the DM target representation. In such examples the syntactic dependencies, i.e. their edges and labels, can function as parameters for distinguishing between these two type of frames. If we examine the type of errors that our previous experiments produce, it is these type of ambiguous verbs that account for a high percentage of errors.
+
+For syntactic dependencies we will add the dependencies of the main token. We will add dependents by concatenating the lemma and label of that dependency: <lemma\_label>. The main verb of a dependency usually have several dependencies, so we concatenate them all to a string as its own feature, sorting them by the dependency label in lexical order. As an example, for the token `join' we would have the string: <will\_aux:board\_obj:Vinken\_nsubj>, as the dependencies.
+
+We will also examine the effect of adding the head of our main tokens in the same way as our dependents, with the exception that we always have at most one syntactic head, and so we therefore add the heads lemma and label concatenated as its own feature. We also do a combination of adding head and the dependents.
+
+In Table \ref{table:dependents_head} we see the results for these set of experiments. We see can observe that it is the dependents that have an impact on the score, and that adding heads actually reduces the accuracy of our model. The reason for this slight increase in our scores can be attributed to the observation that these are very sparse features. We therefore decide to examine the effects of using part of speech and dependency label as the concatenated string for dependents. This will produce less sparse feature vectors. We also test a reduction technique where we reduce the maximum number of dependents. We test for a range covering ${\{n|n>1 \wedge n<5\}}$, where $n=2$ signifies that we use two dependents.
+
+\begin{table}
+    \centering
+    \smaller[0.2]
+    \begin{tabular}{@{}lllll@{}}
+        \toprule
+        \textbf{Representation} & \textbf{Precision} & \textbf{Recall} & \textbf{F-score} \\
+        DM &  88.97 & 88.77 & 88.50 \\
+        PSD & 84.23 & 85.61 & 84.00 \\
+        \midrule
+        DM &  88.18 & 88.04 & 87.81 \\
+        PSD & 84.05 & 85.42 & 83.86 \\
+        \midrule
+        DM &  88.78 & 88.68 & 88.35 \\
+        PSD & 83.95 & 85.46 & 83.77 \\
+        \bottomrule
+    \end{tabular}
+    \caption{Results for adding <lemma\_label> syntactic dependencies: only dependents (top), only the head (middle), and a combination of both (bottom).}
+    % We see that head does not impact the results.
+    \label{table:dependents_head}
+\end{table}
+
+\begin{table}
+    \centering
+    \smaller[0.2]
+    \begin{tabular}{@{}lllll@{}}
+        \toprule
+        \textbf{Representation} & \textbf{Precision} & \textbf{Recall} & \textbf{F-score} \\
+        DM &  88.98 & 88.76 & 88.51 \\
+        PSD & 84.21 & 85.50 & 83.94 \\
+        \midrule
+        DM &  88.97 & 88.81 & 88.55 \\
+        PSD & 84.32 & 85.50 & 84.01 \\
+        \midrule
+        DM &  89.04 & 88.84 & 88.60 \\
+        PSD & 84.27 & 85.51 & 83.97 \\
+        \midrule
+        DM &  88.94 & 88.75 & 88.48 \\
+        PSD & 84.24 & 85.5 & 83.95 \\
+        \midrule
+        DM &  88.94 & 88.75 & 88.49 \\
+        PSD & 84.21 & 85.49 & 83.93 \\
+        \bottomrule
+    \end{tabular}
+    \caption{Results for adding <pos\_label> syntactic dependencies: dependents (first), reduced number of dependents to $n=3$ (second), $n=4$ (third), and $n=5$ (fourth).}
+    \label{table:dependents_head}
+\end{table}
+
+\subsection{Semantic}
+\label{results_sem}
+% These should introduce even better features for frames.
+
+In a similar fashion as syntactic dependencies, the additional information from semantic dependencies as features may increase the likelihood of our machine learning models to distinguish ambiguous verbs. 
+
+We will add semantic dependencies in the same fashion as syntactic dependencies.
+
+
+\subsection{Syntactic and Semantic}
+\label{results_syn_sem}
+
+In this section we will combine syntactic and semantic features.
+
+
+\section{Final Results}
+\label{results_final}
+
+Now that we are done with our feature selection and finished our parameter adjustments, we will run our classifier against the test data in order to report the final results of our classifier. There are a few considerations to discuss before we do so. As mentioned in the introduction to this chapter, we will present three potential classifiers. All three classifiers share the same basis of lexical and morphological features. Their divergence is in their usage of syntactic and semantic information for their features. 
+
+The first classifier will have syntactic features as added information. In this regard, this classifier will be judged as a contender to the classifiers in SemEval-2015 that participated in the open run. The second classifier will use semantic information as features, and will thus have a comparative basis against the participants in the closed run. The last classifier will use a combination of both syntactic and semantic information, and will thus have its comparative basis in the open track.
+
+\subsection{Comparisons}
+\label{comparisons}
+
+\section{Conclusions}
