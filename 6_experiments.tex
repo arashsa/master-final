@@ -1,13 +1,27 @@
 \chapter{Experiments}
 \label{chap:results}
 
-In this chapter we will examine and present the results of a set of experiments leading to a semantic frame classifier. We will use the data sets presented in Chapter \ref{chap:analysis}, and \ref{chap:experiments} for training, development and testing. We will examine how each set of features, that we discussed in Chapter \ref{chap:experiments}, influence the precision, recall and f-score of our models. The mathematical definitions of these measures can be found in Chapter \ref{chap:analysis}. The end result of our experiments will be three different semantic frame classifiers. Once we have finished our experiments on the development data set, we present our final results by using the test data. Our results show that with rigorous experimentation with different combination of features, we where able to obtain state-of-the-art results for semantic frame classification.
+% random baseline
+% most frequent class vs most frequent per lemma
+% the latter is a strong baseline
+% PSD, multiclass classification is good for PSD, it is noteworthy. 
+% For PSD Praha uses a classificator for each lemma
+% Sanity test for lemma test
+% why is lemma and form higher for PSD. Tense may play a greater role in PSD. 
+% surface instead of lexical
+% n-gram to window
+% form-window
+% could have done things in a more greedy fashion, but we used a method where we build upon previous results
+% syntactic - label + pos, just labels
+% semantic - label + pos, just labels
+% SVM undemanding in terms of parameter tuning
 
+In this chapter we will examine and present the results of a set of experiments leading to a semantic frame classifier. We will use the data sets presented in Chapter \ref{chap:analysis}, and \ref{chap:experiments} for training, development and testing. We will examine how each set of features, that we discussed in Chapter \ref{chap:experiments}, influence the precision, recall and f-score of our models. The mathematical definitions of these measures can be found in Chapter \ref{chap:analysis}. The end result of our experiments will be three different semantic frame classifiers. Once we have finished our experiments on the development data set, we present our final results by using the test data. Our results show that with rigorous experimentation with different combination of features, we where able to obtain state-of-the-art results for semantic frame classification.
 
 
 \section{Baseline}
 
-Before we start our experiments, we need to define a baseline in order to have a common denominator that we can evaluate our results against. There are no agreed upon standards for defining a baseline for classification tasks such as semantic frame detection. Statistical counting measures have been the standard in other tasks such as \textit{part of speech tagging}. We will use this approach as basis for our baseline.
+Before we start our experiments, we need to define a baseline in order to have a common denominator that we can evaluate our results against. There are no agreed upon standards for defining a baseline for classification tasks such as semantic frame detection. Statistical counting measures have been the standard in other tasks such as \textit{part of speech tagging}. We will draw inspiration from methods used in part of speech tagging for setting up a basleline for our task.
 
 \begin{table}
     \centering
@@ -296,6 +310,8 @@ We will now examine how part of speech tags may affect the accuracy of our model
 
 We will now consider adding prefixes and suffixes as features. For prefixes and suffixes we add character n-grams where ${\{n|n>2 \wedge n<5\}}$. This ensures that we capture various types of prefixes and suffixes that may be constrained by character length, such as the suffixes `ing' and `ed'. It is difficult estimating the effect of adding such morphological features, as the increase in our score is minimal. In Table \ref{table:affix_suffix} we observe that only prefixing has an added impact on the score, the other experiments actually had a negative impact on the scores. We will therefore leave prefixes and suffixes outside the scope of further experiments and note that its impact is minimal.
 
+However, it is worth mentioning that we have now reached a saturation in the effects of adding new layers of features to the existing set of features, and it is thus difficult to assess the actual impact of new features in terms of their relative addition in comparison with previously added features.
+
 \subsection{Syntactic}
 \label{results_syn}
 
@@ -309,7 +325,9 @@ For syntactic dependencies we will add the dependencies of the main token. We wi
 
 We will also examine the effect of adding the head of our main tokens in the same way as our dependents, with the exception that we always have at most one syntactic head, and so we therefore add the heads lemma and label concatenated as its own feature. We also do a combination of adding head and the dependents.
 
-In Table \ref{table:dependents_head} we see the results for these set of experiments. We see can observe that it is the dependents that have an impact on the score, and that adding heads actually reduces the accuracy of our model. The reason for this slight increase in our scores can be attributed to the observation that these are very sparse features. We therefore decide to examine the effects of using part of speech and dependency label as the concatenated string for dependents. This will produce less sparse feature vectors. We also test a reduction technique where we reduce the maximum number of dependents. We test for a range covering ${\{n|n>1 \wedge n<5\}}$, where $n=2$ signifies that we use two dependents.
+In Table \ref{table:dependents_head} we see the results for these set of experiments. We see can observe that it is the dependents that have an impact on the score, and that adding heads actually reduces the accuracy of our model. The reason for this slight increase in our scores can be attributed to the observation that these are very sparse features. 
+
+We therefore decide to examine the effects of using part of speech and dependency label as the concatenated string for dependents. This will produce less sparse feature vectors. We also test a reduction technique where we reduce the maximum number of dependents. We test for a range covering ${\{n|n>1 \wedge n<5\}}$, where for instance $n=2$ signifies that we use two dependents. In Table \ref{able:syntactic_dependents_n} we see the results of these experiments.
 
 \begin{table}
     \centering
@@ -354,23 +372,74 @@ In Table \ref{table:dependents_head} we see the results for these set of experim
         PSD & 84.21 & 85.49 & 83.93 \\
         \bottomrule
     \end{tabular}
-    \caption{Results for adding <pos\_label> syntactic dependencies: dependents (first), reduced number of dependents to $n=3$ (second), $n=4$ (third), and $n=5$ (fourth).}
-    \label{table:dependents_head}
+    \caption{Results for adding <pos\_label> syntactic dependencies: all dependents (first), reduced number of dependents to $n=2$ (second), $n=3$ (third), $n=4$ (fourth), and $n=5$ (fifth).}
+    \label{table:syntactic_dependents_n}
 \end{table}
 
 \subsection{Semantic}
 \label{results_sem}
-% These should introduce even better features for frames.
 
-In a similar fashion as syntactic dependencies, the additional information from semantic dependencies as features may increase the likelihood of our machine learning models to distinguish ambiguous verbs. 
+\begin{table}
+    \centering
+    \smaller[0.2]
+    \begin{tabular}{@{}lllll@{}}
+        \toprule
+        \textbf{Representation} & \textbf{Precision} & \textbf{Recall} & \textbf{F-score} \\
+        DM &  93.77 & 94.03 & 93.69 \\
+        PSD & 84.66 & 86.5 & 84.70 \\
+        \midrule
+        DM &  92.25 & 92.53 & 92.14 \\
+        PSD & 85.04 & 86.86 & 85.14 \\
+        \midrule
+        DM &  93.85 & 94.1 & 93.76 \\
+        PSD & 84.71 & 86.55 & 84.75 \\
+        \midrule
+        DM &  93.77 & 94.03 & 93.69 \\
+        PSD & 84.70 & 86.51 & 84.71 \\
+        \midrule
+        DM &  93.77 & 94.03 & 93.69 \\
+        PSD & 84.67 & 86.51 & 84.70 \\
+        \bottomrule
+    \end{tabular}
+    \caption{Results for adding <pos\_label> semantic dependencies: all dependents (first), reduced number of dependents to $n=2$ (second), $n=3$ (third), $n=4$ (fourth), and $n=5$ (fifth).}
+    \label{table:semantic_dependents_n}
+\end{table}
 
-We will add semantic dependencies in the same fashion as syntactic dependencies.
+In a similar fashion as syntactic dependencies, the additional information from semantic dependencies as features may increase the likelihood of our machine learning models to distinguish ambiguous verbs. We will add semantic dependencies in the same fashion as syntactic dependencies. We omit the results for adding heads for semantic dependencies, which in the same way as syntactic dependencies had a negative effect on the accuracy, and we leave out the results from our reporting.
+
+In Table \ref{table:semantic_dependents_n} we can observe the results for using semantic dependency parsing as part of our feature space. The most surprising results in our experimentation occurs when we use semantic dependency graphs for the DM target representation. For the DM target representation we see a very large increase in the accuracy, with an increase from 88.20\% from the previously best f-score (without syntactic features), to 93.69\% when adding semantic dependencies as features.
 
 
 \subsection{Syntactic and Semantic}
 \label{results_syn_sem}
 
-In this section we will combine syntactic and semantic features.
+\begin{table}
+    \centering
+    \smaller[0.2]
+    \begin{tabular}{@{}lllll@{}}
+        \toprule
+        \textbf{Representation} & \textbf{Precision} & \textbf{Recall} & \textbf{F-score} \\
+        DM &  93.78 & 94.08 & 93.71 \\
+        PSD & 84.51 & 86.46 & 84.53 \\
+        \midrule
+        DM &  92.28 & 92.59& 92.18 \\
+        PSD & 85.05 & 86.87 & 85.06 \\
+        \midrule
+        DM &  x93.85 & 94.1 & 93.76 \\
+        PSD & x84.71 & 86.55 & 84.75 \\
+        \midrule
+        DM &  x93.77 & 94.03 & 93.69 \\
+        PSD & x84.70 & 86.51 & 84.71 \\
+        \midrule
+        DM &  x93.77 & 94.03 & 93.69 \\
+        PSD & x84.67 & 86.51 & 84.70 \\
+        \bottomrule
+    \end{tabular}
+    \caption{Results for adding <pos\_label> semantic and syntactic dependencies: all dependents (first), reduced number of dependents to $n=2$ (second), $n=3$ (third), $n=4$ (fourth), and $n=5$ (fifth).}
+    \label{table:semantic_dependents_n}
+\end{table}
+
+In this section we will combine syntactic and semantic features. We run the same experiments as we did for both syntactic and semantic features on their own right.
 
 
 \section{Final Results}
