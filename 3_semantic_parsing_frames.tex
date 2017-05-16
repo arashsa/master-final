@@ -38,7 +38,7 @@ The data-sets that we will examine are all represented in the SDP format\footnot
 \begin{figure}
     \centering
     \smaller[]
-    % \smaller[]
+    \smaller[]
     \begin{dependency}[]
         \begin{deptext}[column sep=0.5em, row sep=.1ex]
             Bramalea \& said \& it \& expects \& to \& complete \& the \& issue \& by \& the \& end \& of \& the \& month \& . \\
@@ -59,7 +59,7 @@ The data-sets that we will examine are all represented in the SDP format\footnot
 \begin{figure}
     \centering
     \smaller[]
-    % \smaller[]
+    \smaller[]
     \begin{dependency}[]
         \begin{deptext}[column sep=0.5em, row sep=.1ex]
             Bramalea \& said \& it \& expects \& to \& complete \& the \& issue \& by \& the \& end \& of \& the \& month \& . \\
@@ -86,6 +86,7 @@ The data-sets that we will examine are all represented in the SDP format\footnot
 
 \begin{figure}
     \centering
+    \smaller[]
     \smaller[]
     \smaller[]
     % \tiny
@@ -115,6 +116,7 @@ The data-sets that we will examine are all represented in the SDP format\footnot
 \begin{figure}
     \centering
     \smaller[]
+    \smaller[]
     % \smaller[]
     \begin{dependency}[]
         \begin{deptext}[column sep=0.2em, row sep=.1ex]
@@ -139,7 +141,7 @@ The data-sets that we will examine are all represented in the SDP format\footnot
 
 \end{displayquote}
 
-\paragraph{PCEDT: Prague Tectogrammatical Bi-Lexical Dependencies} The Prague Czech-English Dependency Treebank \cite{PCEDT}\footnote{See \url{http://ufal.mff.cuni.cz/pcedt2.0/}} is a dependency treebank over the WSJ from the PTB. The original English texts have been annotated along with annotated Czech translations. Similar to other treebanks from the PTB, these texts have been annotated with two layers of syntactic information: \textit{analytical} (a-layer) and \textit{tectogrammatical} (t-layer) \cite{Oepen:14}. The a-layer represents the so-called surface syntax, where the labels in the dependencies represent the syntactic information of the sentence. The t-layer is a layer where syntax and semantic dependencies are represented, and is based on the framework of the Functional Generative Description \cite{Sgall:86}. A conversion has been used in order to reach the SDP data format from this t-layer; see \citeA{Miyao:14} for details on the conversion from the t-layer of the PCEDT representation to the SDP representation.
+\paragraph{PCEDT: Prague Tectogrammatical Bi-Lexical Dependencies} This target representation is base on the Prague Czech-English Dependency Treebank \cite{PCEDT}\footnote{See \url{http://ufal.mff.cuni.cz/pcedt2.0/}}. It is a dependency treebank over the WSJ from the PTB. The original English texts have been annotated along with annotated Czech translations. Similar to other treebanks from the PTB, these texts have been annotated with two layers of syntactic information: \textit{analytical} (a-layer) and \textit{tectogrammatical} (t-layer) \cite{Oepen:14}. The a-layer represents the so-called surface syntax, where the labels in the dependencies represent the syntactic information of the sentence. The t-layer is a layer where syntax and semantic dependencies are represented, and is based on the framework of the Functional Generative Description \cite{Sgall:86}. A conversion has been used in order to reach the SDP data format from this t-layer; see \citeA{Miyao:14} for details on the conversion from the t-layer of the PCEDT representation to the SDP representation.
 
 \paragraph{PAS: Enju Predicate–Argument Structures} The Enju representation is based on Head-driven phrase structure grammar (HPSG), and is derived from the Enju HPSG treebank. This treebank is made by way of conversions from the phrase structure and predicate-argument representation of the PTB \cite{Oepen:14}. The PAS representation is extracted from the predicate-argument structures of the HPSDG Treebank. This predicate-argument structure represent bi-lexical semantic dependencies. As the PCEDT format, we refer the reader to \citeA{Miyao:14} for the technical details on the conversion to the SDP data format.
 
@@ -290,7 +292,7 @@ A so-called \textbf{alternating directions dual decomposition} is used in order 
     \centering
     \smaller[]
     \smaller[]
-    \smaller[0.5]
+    \smaller[]
     \begin{tabular}{@{}cccccccccccccc@{}}
         \toprule
         \multicolumn{1}{c}{ }

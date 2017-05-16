@@ -1,22 +1,30 @@
 \chapter{Semantic Frame Classification}
 \label{chap:experiments}
 
+The task that we embark upon is to build a \textit{semantic frame classifier}. The steps involved in this process are threefold: 
 
-We start this chapter by taking a closer look at the data sets that we use for training, developing and testing, through a set of experiments, a classifier for predicting semantic frames. The experiments and results of the classification will be presented in Chapter \ref{chap:results}. In this chapter we will focus on the feature selection and machine learning algorithms which serve as the foundation of our experiments. 
+\begin{enumerate}
+    \item Find a machine learning algorithm for the classification task.
+    \item Investigate the effects of using different types of linguistically motivated features as input for training.
+    \item Present the results of our classifier and compare our results with the current state-of-the-art.
+\end{enumerate}
 
-We use the DM and PSD target representations as basis for our experiments, and leave out PAS as it does not have semantic frames as part of its annotation scheme. This aligns with the analysis of the SemEval-2015 submissions from the previous chapter. We will also rely on the analysis of semantic frames from the previous chapter as basis for our feature selection.
+The motivating force behind our endeavours is the analysis presented in Chapter \ref{chap:analysis}. Our explorations led us to the conclusion that an interesting aspect of semantic dependency parsing would be to elevate the accuracy of semantic frame classification. The potential that reside in a more accurate semantic frame classifier is the possibility of using its results to get better semantic dependency parsing results. The output of our semantic frame classifier could be used as 
 
-The main part of this chapter will be dedicated to presenting the \textit{features} that we use as parameters for training our classifier. Features are individual properties that are either derived directly from the data sets, or by way of some transformation which can also include additional resources. The set of features we use for training our machine learning algorithms will determine their accuracy. We split our semantic frame classification into three different classifiers where the data used for training differentiates their outcome and usage:
+We start this chapter by taking a closer look at the data sets that we use for training, developing and testing, through a set of experiments, a classifier for predicting semantic frames. The experiments and results of the classification will be presented in Chapter \ref{chap:results}. In this chapter we will focus on the different types of feature selection that we will examine, and the machine learning algorithms that we will use, as part of of our experiments in Chapter \ref{chap:results}.
+
+We use the DM and PSD target representations as basis for our experiments, and leave out PAS as it does not have semantic frames as part of its annotation scheme. This aligns with the analysis of the SemEval-2015 submissions from the previous chapter.
+
+The main part of this chapter will be dedicated to presenting the \textit{features} that we use as parameters for training our classifier. Features are individual properties that are either derived directly from the data sets, or by way of some transformation which can also include additional resources. The set of features we use for training our machine learning algorithms will determine their accuracy. We split our semantic frame classification into two different classifiers where the feature sets used for training differentiates their outcome and usage:
 
 \begin{enumerate}
     \item Classifying semantic frames based on \textit{lexical}, \textit{morphological} and \textit{syntactic} features.
     \item Classifying semantic frames based on \textit{lexical}, \textit{morphological} and \textit{semantic} features.
-    \item Classifying semantic frames by combining the features of 1. and 2, i.e. using both syntactic and semantic features.
 \end{enumerate}
 
-The first set of experiments rely on information that does not rely on semantic dependency graphs. Our end result is a classifier where the predictions can be used as part of the feature space for training a semantic dependency parser. This could possibly increase the accuracy of state-of-the-art semantic dependency parsers. The second set of experiments leads to a classifier that relies on the results of a semantic dependency parser for its classification. We leave out syntactic information in this set of experiments in order to compare our results to the SemEval-2015 submissions that participated in the closed track. The last set of experiments would be a semantic frame classifier that relies on both a syntactic and semantic parser, and would be comparable to the parsing systems that participated in the SemEval-2015 open track.
+The first set of experiments make use of features that do not rely on semantic dependency graphs. Our end result is a classifier where the predictions can be used as part of the input to a semantic dependency parser. This could possibly increase the accuracy of state-of-the-art semantic dependency parsers. The second set of experiments leads to a classifier that relies on the results of a semantic dependency parser for its classification. We leave out syntactic information in this set of experiments in order to compare our results to the SemEval-2015 submissions that participated in the closed track. The last set of experiments would be a semantic frame classifier that relies on both a syntactic and semantic parser, and would be comparable to the parsing systems that participated in the SemEval-2015 open track.
 
-In this chapter we will also present our experimental setup, i.e. how we prepare the data for training, development and testing. We will also provide overviews of the machine learning algorithms used as basis for our experiments. We have decided to run our experiments on \textit{Decision Trees}, \textit{Support Vector Machines}, \textit{Logistic Regression} and \textit{K-nearest neighbors}. This ensures a comparative basis for the choice of a machine learning algorithm as basis for our classifier.
+In this chapter we will also present our experimental setup, i.e. how we prepare the data for training, development and testing. We will also provide overviews of the machine learning algorithms used in our experiments. We have experimented with 4 machine learning algorithms: \textit{Decision Trees}, \textit{Support Vector Machines}, \textit{Logistic Regression} and \textit{K-nearest neighbors}. This ensures that we have a comparative basis for the choice of a machine learning algorithm for frame classification.
 
 
 \section{Experimental setup}
@@ -69,19 +77,19 @@ In this chapter we will also present our experimental setup, i.e. how we prepare
 
 We have already explored the details of our data sets in Chapter \ref{chap:semantic}. In this section we focus on how we use the data to train, develop and test our machine learning models. As part of SemEval-2015, an official test data set was made available, and as such we do not need to set aside a test set for our final evaluation. In order to have a data set for tuning while we are experimenting with our feature selection, we need to set aside part of the training data for development purposes.
 
-In Table \ref{table:split} we can observe some higher order statistics on the training, development and test data sets. We have split the original training set using an often used 80-20 split, where we extract 20\% of the training data for tuning and development purposes during our experimentation. This is to ensure that we do not run our experiments on the test data set, and thus avoid over-fitting our machine learning models by selecting features that increase the accuracy of our models directly on the test data.
+In Table \ref{table:split} we can observe some higher order statistics on the training, development and test data sets. We have split the original training set using a commonly used 80-20 split, where we extract 20\% of the training data for tuning and development purposes during our experimentation. This is to ensure that we do not run our experiments on the test data set, and thus avoid over-fitting our machine learning models by selecting features that increase the accuracy of our models directly on the test data.
 
-Once we are ready to run a final set of tests, we will train our classifiers on the whole training set, including the held out development set used for tuning purposes, and observe the accuracy of our models on the official test set. This will then be presented as the final results of our classification task.
+Once we are ready to run a final set of tests, we will train our classifiers on the whole training set, including the held out development set used for tuning purposes, and observe the accuracy of our models on the official held-out test set. This will then be presented as the final results of our classification task.
 
-In Table \ref{table:split} we observe that the test data consists of in-domain and out-of-domain data. We will test our machine learning models on both these data sets in the final rounds of testing. Our hypothesis, based on the results of the SemEval-2015 submissions, and general intuition about machine learning, is that the accuracy of our classifier will be lower on the out-of-domain data sets.
+In Table \ref{table:split} we observe that the test data consists of in-domain (id) and out-of-domain data (ood). We will test our machine learning models on both these data sets in the final rounds of testing. Our hypothesis, based on the results of the SemEval-2015 submissions, and general knowledge about machine learning algorithms, is that the accuracy of our classifier will be lower on the out-of-domain data sets.
 
 Examining Table \ref{table:split} further, we see that the training data consists of 28525 sentences, the development data set of 7131 sentences, the in-domain test set of 1410 sentences and out-of-domain test set of 1849 sentences. For the DM target representation we observe a total of 494122 occurrences of frames in the training set, consisting of 466 unique frames. For the PSD training set, we observe 72006 occurrences of frames and a total number of 5074 unique frames. It is therefore important to note that due to the higher number of unique frames in the PSD data set, we can hypothesize that we will observe a relative drop in the accuracy of our classifier in comparison to the DM target representation.
 
-In evaluating the performance of our models, we follow the SemEval-2015 scoring scheme, which was presented in Chapter \ref{chap:analysis}. In terms of only scoring frames that are not singletons, we do not use this information during training and classification. We train our model on all tokens that have a part of speech tag that starts with the character `V'. During classification we also predict semantic frames for all tokens that have a part of speech tag that starts with `V', but exclude tokens that are singletons as a post-processing step when we evaluate our models.
+In evaluating the performance of our models, we follow the SemEval-2015 scoring scheme, which was presented in Chapter \ref{chap:analysis}. The scoring scheme excludes all tokens that are singletons, and only evaluates those that have a part of speech tag that starts with the character `V'. However, it is worth mentioning that that during training and prediction, we do not use this information. It is only at evaluation time that we exclude all the tokens that do not fit the scoring scheme.
 
-Now that we have some further insight into the data, and the experimental setup for our classification task, we present the feature selection that will function as basis for our experiments.
+Now that we have some further insight into the data, and the experimental setup for our classification task, we present the feature design that we will use in our experiments. It is worth noting that we are mainly interested in feature design in our experiments, and leave out parameter tuning of machine learning algorithms.
 
-\section{Feature Selection}
+\section{Feature Design}
 \label{features}
 
 \begin{figure}
@@ -118,43 +126,74 @@ Now that we have some further insight into the data, and the experimental setup 
     \label{DM:all}
 \end{figure}
 
-Feature selection is a process where we select the data that will be given to our machine learning algorithms as basis for its learning. For each token in the data, we extract a set of features that are used as input data for the machine learning algorithms as parameters for learning. During the training, each feature set has a corresponding semantic frame as its correct class. The machine learning will use this as basis for learning a mapping from a set of features to a correct semantic frame. Once a model has been trained, we can evaluate its performance by predicting classes for unseen tokens in the left out data used for development purposes. The score from this evaluation will be the basis for tuning, i.e. changing the set of features used for training.
+\begin{figure}
+    \centering
+    \smaller[]
+    \smaller[]
+    \begin{dependency}[]
+        \begin{deptext}[column sep=0.5em, row sep=.1ex]
+            Bramalea \& said \& it \& expects \& to \& complete \& the \& issue \& by \& the \& end \& of \& the \& month \& . \\
+        \end{deptext}
+        \deproot{2}{root}
+        \depedge{2}{1}{nsubj}
+        \depedge{2}{4}{ccomp}
+        \depedge[edge unit distance=1.2ex]{2}{15}{punct}
+        \depedge{4}{3}{nsubj}
+        \depedge{4}{6}{xcomp}
+        \depedge{6}{5}{aux}
+        \depedge{6}{8}{dobj}
+        \depedge{6}{9}{prep}
+        \depedge{8}{7}{det}
+        \depedge{9}{11}{pobj}
+        \depedge{11}{10}{det}
+        \depedge{11}{12}{prep}
+        \depedge{12}{14}{pobj}
+        \depedge{14}{13}{det}
+    \end{dependency}
+    \caption{An example of syntactic dependencies, taken from the training data, and annotated with dependencies and labels with the so-called Stanford Basic scheme.}
+    \label{DM:syntactic}
+\end{figure}
+
+Feature design is a process where we select the data that will be given to our machine learning algorithms as basis for its learning. For each token in the data, we extract a set of features that are used as input data for the machine learning algorithms as parameters for learning. During the training, each feature set has a corresponding semantic frame as its correct class. The machine learning will use this as basis for learning a mapping from a set of features to a correct semantic frame. Once a model has been trained, we can evaluate its performance by predicting classes for unseen tokens in the data used for development purposes. The score from this evaluation will be the basis for tuning, i.e. adjusting the set of features used for training.
 
 There are no well defined methods by which we can empirically select the features that will result in the most accurate machine learning model. This is due to the fact that the feature space that is possible to construct is not finite, and we therefore have no way of testing all possible feature sets in order to find the set that will produce the most accurate classifier. We must therefore heuristically select our features by examining their impact on the accuracy of our classifiers.
 
-When choosing features for our classifier we consider 3 factors:
+When choosing features for our classifier we consider two factors:
 
 \begin{enumerate}
     \item Improving accuracy: We aim for features that increase overall accuracy of our model.
     \item Reducing over-fitting: We create a development set so that we do not over-fit our features to the data.
-    \item Reducing training and testing time: We employ a range of statistical measures for feature reduction so that we can increase the speed of training in order to run as many experiments as needed during our feature selection.
 \end{enumerate}
 
-We have chosen to base our feature selection on 4 sets of \textit{feature types}: lexical, morphological, syntactic and semantic. Examining Figure \ref{DM:all}, we have an example sentence taken from the training data which includes most of the information we will use as features. This example has been taken from the DM target representation. We start from the top of this figure. 
+We have chosen to base our feature extraction on 4 sets of \textit{feature types}: lexical, morphological, syntactic and semantic.
 
-The first layer of information is the labeled semantic dependencies. We will use labeled dependencies as part of our feature space in the second and third classifier. For the second classifier we will use syntactic dependencies. For the syntactic dependencies we use the companion files distributed as part of SemEval-2015, where syntactic dependencies on the training and test data have been produced using the so-called Stanford Basic scheme derived from the Penn Treebank \cite{PennTreebank}. The parser of \citeA{Boh:Niv:12} have been used for the parsing.
+Examining Figure \ref{DM:all}, we have an example sentence taken from the training data which includes most of the information we will use as features. This example has been taken from the DM target representation. The first layer of information in Figure \ref{DM:all} is the labeled semantic dependencies. We will use these labeled dependencies as part of our feature space in the second classifier. 
 
 In the next layer of information we have the \textit{token forms}, i.e. the words in their original form. The word forms are the units of information that are closest to the actual data (corpora), and the processing that has been performed in this layer is a tokenization step. For frame classification, we will use the token form as basis for our first set of experiments. However, as we will show in our experiments, using token form as our sole feature has its limitations, and with the size of our data and choice of machine learning algorithms, additional features are necessary in order to achieve state-of-the-art accuracy.
 
-In the next layer of Figure \ref{DM:all}, we have the \textit{token lemma}. The \textit{lemma} of a word is its base representation. An example of this are the verbs `run', `runs', `ran' and `running', which are different word forms that share the same lemma `run'. Lemmatisation is a \textit{lossy} processing step whereby we lose some information by transforming words from one form to another. What we gain from processing tokens to find their base representation is a reduced vocabulary size, which in turn presents us with more coarse representations of a token and its context. The usage of lemma as features can thus increase classification accuracy for a set of tasks. However, some information is lost in this process, which for the case of semantic frame classification can lead to lower precision for tokens that are possibly mapped to a large set of semantic frames.
+In the next layer of Figure \ref{DM:all}, we have the \textit{token lemma}. The \textit{lemma} of a word is its base form representation. An example of this are the verbs `run', `runs', `ran' and `running', which are different word forms that share the same lemma `run'. Lemmatisation is a \textit{lossy} processing step whereby we lose some information by transforming words from one form to another. What we gain from processing tokens to find their base representation is a reduced vocabulary size, which in turn presents us with more coarse representations of a token and its context. The usage of lemma as features can thus increase classification accuracy for a set of tasks. However, some information is lost in this process, which for the case of semantic frame classification can lead to lower precision for tokens that are possibly mapped to a large set of semantic frames.
 
-The layer below the token lemma, we have part of speech tags. These are grammatical categories, such as Nouns, Verbs, Adverbs, that have been assigned to the tokens of a sentence. Part of speech tags can help in disambiguation tasks when there is a possible link to a semantic frame for a token that has a set of possible frames where token form, or token lemma, fall short.
+In the layer below the token lemma, we have part of speech tags. These are grammatical categories, such as Nouns, Verbs, Adverbs, that have been assigned to the tokens of a sentence. Part of speech tags can help in disambiguation tasks when there is a possible link to a semantic frame for a token that has a set of possible frames where token form, or token lemma, fall short.
 
-We will now examine how we will use these possible features in our experiments, and give definitions for these feature sets.
+In Figure \ref{DM:syntactic} we have an example of syntactic dependencies. For the syntactic dependencies we use the companion files distributed as part of SemEval-2015, where syntactic dependencies on the training and test data have been produced using the so-called Stanford Basic scheme derived from the Penn Treebank \cite{PennTreebank}. The parser of \citeA{Boh:Niv:12} have been used for the parsing. Syntactic features will be part of our first classifier.
+
+We will now examine how we will use these features in our experiments, and give definitions for these feature sets.
 
 \subsection{Lexical and Morphological Features}
 
-The lexical features that we will examine in our experiments are the \textit{token forms}, \textit{token lemmas} themselves, and \textit{prefixes} and \textit{suffixes} that we can derive form these. The information contained in word forms are the most fine grained information that resides in a sentence. The token forms are the information that acts as the basis for all the other features, which have been derive either directly, or indirectly, from these ground units. However, word forms suffer from the fact that in most corpora beyond a certain size, there will be a large set of infrequent word forms. It is therefore likely that using token forms will run into an issue of sparsity for infrequent ambiguous verbs that can be labeled with a range of semantic frames.
+The lexical features that we will examine in our experiments are the \textit{token forms}, \textit{token lemmas} themselves, and \textit{prefixes} and \textit{suffixes} that we can derive from these. The information contained in word forms are the most fine grained information that resides in a sentence, i.e. all other additional layers of information, such as lemmas, part of speech tags, syntactic and semantic dependencies, are in some ways an abstraction layer built upon the word forms themselves. However, for infrequent words, the word form is a sparse feature, and our machine learning models' predictive power will suffer as a result.
 
-The lemma of a token will not fully resolve the sparsity connected to infrequent word forms. However, it will reduce the vocabulary of a corpora, and provide learning examples whereby a machine learning algorithm can connect an infrequent word form with its family of word forms, i.e. its lemma. However, for more frequent verbs, the disambiguation needed to distinguish between many classes of semantic frames, we might lose accuracy if we use lemma as a substitute for word form. A combination of form and lemma, which will be confirmed through our experimentation, is more likely to produce greater accuracy.
+The lemma of a token will not fully resolve the sparsity connected to infrequent word forms. However, it will reduce the vocabulary of a corpus, and provide learning examples whereby a machine learning algorithm can connect an infrequent word form with its family of word forms, i.e. its lemma. However, for more frequent verbs, the disambiguation needed to distinguish between many classes of semantic frames, and we thus have a risk of reducing the accuracy of our models. A combination of form and lemma, which will be confirmed through our experimentation, is more likely to produce greater accuracy.
 
-Prefixes and suffixes of word forms may introduce patterns in the data that may be useful for semantic frame classification. Our hypothesis is that, particularly suffixes, with such patterns as `ing', `ed', and `ang', may provide some additional information on the usage and context of a verb. However, these may also be too general too actually provide useful features for distinguishing between the correct semantic frame.
+Prefixes and suffixes of word forms may introduce patterns in the data that may be useful for semantic frame classification. Our hypothesis is that, particularly suffixes, with such patterns as `ing', `ed', and `ang', may provide some additional information on the usage and context of a verb. However, these may also be too general too actually provide useful features for distinguishing between the correct semantic frame. We will examine the effects of adding prefixes and suffixes so that we can observe the potential effects such additional features may have. We compute prefixes and suffixes by extracting $n$ characters from the end (for suffixes), and from the beginning (for prefixes) of a word form.
 
 \subsection{Syntactic Features}
 
 The syntactic features we will experiment with as part of our feature selection are the labeled dependencies in a syntactic dependency tree. Each sentence in the data set has a corresponding syntactic dependency tree. These trees are highly interesting in relation to our classification task. The semantic frame of a token is in many cases connected to the number of arguments a verb can take, and the type of dependency labels they have. Using the dependents of a token as a set of features may help distinguish between the various frames for ambiguous verbs where other features may be less relevant. Our experiments will include using the dependency labels in connection with the token form, token lemma, and the part of speech tag of the dependent.
 
-We can also use the head of a token as its feature. Our hypothesis is that the heads of verbs do not add the necessary information that could possibly help in distinguishing their specific frame.
+We will also examine the impact that the head will have on detecting semantic frames. The head in a construct, as we described in Chapter \ref{chap:background}, determines the semantic category of a construct, whereas the dependents gives semantic specification. Our hypothesis is therefore that heads are less informative features in distinguishing semantic frames. However, it is worthwhile examining this and empirically verify our hypothesis.
+
+% We can also use the head of a token as its feature. Our hypothesis is that the heads of verbs are not informative in distinguishing its semantic frame. The syntactic head of a word, in particular verbs, does not indicate the sense of a word. 
 
 \subsection{Semantic}
 
@@ -165,17 +204,17 @@ Now that we have presented the possible feature space that we will use for our c
  
 \section{Classification Algorithms}
 
-We have chosen a set of four classifiers for predicting semantic frames in order to have a variety of approaches where we can empirically find a machine learning approach that yields satisfactory results. We start this chapter by providing a short description of the four algorithms that we have chosen for our classification task. These four machine learning algorithms are all implemented and openly available as part of the \textit{scikit-learn toolkit}.
+We have chosen a set of four classifiers for predicting semantic frames in order to have a variety of approaches where we can empirically find a machine learning approach that yields satisfactory results. We start this chapter by providing a short description of the four algorithms that we have chosen for our classification task. These four machine learning algorithms are all implemented and openly available as part of the \textit{scikit-learn toolkit} \cite{scikit-learn}.
 
-Scikit-learn is a high-level machine learning toolkit written in the Python programming language. The authors of scikit-learn describe the toolkit as a set of state-of-the art machine learning algorithms that have been designed for usage on medium-scale supervised and unsupervised problems \cite{scikit-learn}. It well established machine learning toolkit that is both used in research and business.
+Scikit-learn is a high-level machine learning toolkit written in the Python programming language. The authors of scikit-learn describe the toolkit as a set of state-of-the art machine learning algorithms that have been designed for usage on medium-scale supervised and unsupervised problems \cite{scikit-learn}. It is a well established machine learning toolkit that is both used in research and business.
 
-It is worth noting that we ran the experiments on all four algorithms to a certain limit. Once we established the classifier that consistently performed with the highest accuracy on our chosen set of initial features, we limited further explorations to the most accurate algorithm. Since running the experiments on each classifier is time consuming, this decision was necessary once we started performing more in-depth feature selections so that we could proceed in a timely fashion. Our aim is to examine the possibilities of increasing the accuracy of frame detection to rival that of the current state-of-the-art.
+It is worth noting that we ran the experiments on all four algorithms to a certain limit. Once we established the classifier that consistently performed with the highest accuracy on our chosen set of initial features, we limited further explorations to the most accurate algorithm. Since running the experiments on each classifier is time consuming, this decision was necessary once we started performing more in-depth feature selections so that we could proceed in a timely fashion. Our aim is to examine the possibilities of increasing the accuracy of frame detection to rival that of the current state-of-the-art. See Chapter \ref{chap:semantic} for an overview of the most accuracy semantic frame classifiers.
 
 \subsection{Decision Trees}
 
 \textit{Decision Tree Classifiers} learn rules by creating a tree structure with simple rules that are easy to analyze and understand. This can be contrasted to more complex machine learning algorithms such as \textit{neural networks}. In the latter cases the learning and predictions made by the algorithm acts like a `black-box' in terms of comprehensibility.
 
-The decision tree algorithm learns based on a set of labeled instances by inductively setting up a set of rules which form a tree structure. The tree structure can be visualized by thinking of each node in the tree as a question. Classification is done by starting at the root node, and based on the rules that have been learned, classify new data by traversing the tree and reaching a node that is designated by a specific class. For each node, a check is made on the unseen data that is to be labeled as the traversing step. As Kotsiantis note, the process by which a decision tree classifier makes predictions is similar to a greedy search \cite{Kotsiantis:13}.
+The decision tree algorithm learns based on a set of labeled instances by inductively setting up a set of rules which form a tree structure. The tree structure can be visualized by thinking of each node in the tree as a question. Classification is done by starting at the root node, and based on the rules that have been learned, classify new data by traversing the tree and reaching a node that is designated by a specific class. For each node, a check is made on the unseen data that is to be labeled as the traversing step. As \citeA{Kotsiantis:13} note, the process by which a decision tree classifier makes predictions is similar to a greedy search.
 
 The decision tree classifier that is part of the scikit-learn toolkit has a small set of options for creating different types of decision trees. The options include setting the split criteria, where the options are \textit{gini} and \textit{entropy}. As Kotsiantis note, gini and entropy are two different measure used as the splitting measure that the learning algorithm uses in order to create the decision trees \cite{Kotsiantis:13}.
 
@@ -183,9 +222,9 @@ Our experiments showed that decision trees can be a fast and accurate machine le
 
 \subsection{Support Vector Machines}
 
-\textit{Support vector machines} are well suited for multi-class classification tasks, particularly when dealing with high dimensional feature sets as in our case. As Hsu and Lin note, at the time when support vector machines where created it was initially made for binary classification. However, a number of methods have been constructed whereby a support vector machine can be extended to handle multiple classes \cite{Hsu:02}.
+\textit{Support vector machines} are well suited for multi-class classification tasks, particularly when dealing with high dimensional feature sets as in our case. As Hsu and Lin note, at the time when support vector machines where created it was initially made for binary classification. However, a number of methods have been constructed whereby a support vector machine can be extended to handle multiple classes \cite{Hsu:02}. Support vector machines takes a set of instance-label pairs, and solves an unconstrained optimization problem by way of different loss functions. We will not go into the mathematical details of support vector machines, and the reader is referred to \cite{liblinear} for details on the theoretical foundations, and the actual implementation of this algorithm that we will use.
 
-The scikit-learn toolkit has 3 implementations of support vector machines. After a few experiments, we ended up using the `LinearSVC' class, which is a wrapper around the `LIBLINEAR' library developed by  \citeA{liblinear}. Without parameter tuning, this implementation proved the most accurate on our initial set of experiments. We not include the experiments run on the other implementations that are part of the scikit-learn tookit.
+The scikit-learn toolkit has 3 implementations of support vector machines. After a few experiments, we ended up using the `LinearSVC' class, which is a wrapper around the `LIBLINEAR' library developed by \citeA{liblinear}. Without parameter tuning, this implementation proved the most accurate on our initial set of experiments. We do not include the experiments run on the other implementations that are part of the scikit-learn tookit.
 
 The `LIBLINEAR' library is an open source library for large-scale linear classification. It is well suited for large data and feature sets, and it is particularly recommended for text classification by its developers. In certain cases it is also known to be faster than many support vector implementations, including the often used `LIBSVM' library \cite{liblinear}. The other scikit-learn support vector machine algorithms are based on `LIBSVM', which proved to be relatively slower once our feature sets grew to include syntactic and semantic features. We found that by using the `LinearSVC' class in the scikit-learn toolkit we reduce training time, which made it possible to run more experiments in comparison with the other implementations. 
 
@@ -193,9 +232,9 @@ Our experiments showed that support vector machines had the highest overall scor
 
 \subsection{Logistic Regression}
 
-Logistic regression is a machine learning model based on regression analysis. The implementation used in scikit-learn, like the support vector machine implementation described above, is based on the `LIBLINEAR' library. The implementation is of a multivariate logistic regression model with the loss function being $log(1+e^{y_iw^Txi})$, which has been derived from a probabilistic model \cite{liblinear}. 
+Logistic regression is a machine learning model based on regression analysis. The implementation used in scikit-learn, like the support vector machine implementation described above, is based on the `LIBLINEAR' library. The implementation is of a multivariate logistic regression model with the loss function being $log(1+e^{y_iw^Txi})$, which has been derived from a probabilistic model \cite{liblinear}.
 
-We achieved relatively high accuracy using the logistic regression model at a training time that allowed for experimentation with different feature sets. However, as we saw that the support vector implementation scored relatively higher for all lexical and morphological features, we did not further test this algorithm once we started experimenting with syntactic and semantic features. It is our hypothesis that with devoted analysis to the effects of parameter tuning, logistic regression could potentially be an interesting rival to support vector machines for our case. This is based on the fact that logistic regression and support vector machine implementations showed relatively similar accuracy levels on most of the experiments we ran on both algorithms.
+We achieved relatively high accuracy using the logistic regression model at a training time that allowed for experimentation with different feature sets. However, as we saw that the support vector implementation scored relatively higher for all lexical and morphological features, we did not further test this algorithm once we started experimenting with syntactic and semantic features. It is our hypothesis that with devoted analysis to the effects of parameter tuning, logistic regression could potentially be an interesting rival to support vector machines for our case. This is based on the fact that logistic regression and support vector machine implementations showed relatively similar accuracy levels on most of the experiments we ran using both algorithms.
 
 \subsection{K-nearest neighbors}
 
